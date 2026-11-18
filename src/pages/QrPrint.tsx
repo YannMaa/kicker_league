@@ -5,7 +5,7 @@ export function QrPrint() {
   const [url, setUrl] = useState(() => `${location.origin}/game`);
   const [svg, setSvg] = useState('');
   useEffect(() => {
-    QRCode.toString(url, { type: 'svg', margin: 1, width: 480, errorCorrectionLevel: 'M' }).then(setSvg).catch(() => setSvg(''));
+    QRCode.toString(url, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' }).then(setSvg).catch(() => setSvg(''));
   }, [url]);
   return (
     <div>
@@ -19,7 +19,7 @@ export function QrPrint() {
       <div className="mx-auto max-w-md rounded-3xl border-8 border-wood bg-white p-6 text-center text-black">
         <div className="font-score text-5xl tracking-wider text-felt-dark">⚽ AIBE FOOSBALL LEAGUE</div>
         <div className="my-3 font-bold">Scan · Pick players · Enter result</div>
-        <div className="mx-auto w-full max-w-xs" dangerouslySetInnerHTML={{ __html: svg }} />
+        <div className="mx-auto w-full max-w-xs [&>svg]:block [&>svg]:h-auto [&>svg]:w-full" dangerouslySetInnerHTML={{ __html: svg }} />
         <ol className="mx-auto mt-3 max-w-xs list-decimal pl-5 text-left text-sm">
           <li>Scan the QR code</li>
           <li>New? Register quickly &amp; pick an avatar</li>
