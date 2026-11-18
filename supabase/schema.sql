@@ -83,3 +83,7 @@ grant insert (name)                                   on public.labs    to anon,
 grant insert (name, lab_id, avatar_style, avatar_seed) on public.players to anon, authenticated;
 grant insert (mode, red_1, red_2, blue_1, blue_2, score_red, score_blue) on public.games to anon, authenticated;
 grant delete on public.games to anon, authenticated;
+
+-- ---------- Admin-Rechte (Backup/Restore, Dashboard-Korrekturen) ----------
+-- Neue Supabase-Projekte vergeben diese Rechte nicht mehr automatisch.
+grant all on public.labs, public.players, public.games to service_role;
