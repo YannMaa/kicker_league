@@ -9,11 +9,13 @@ import { readFileSync } from 'node:fs';
 import { loadEnv } from './env';
 
 const env = loadEnv();
-const url = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL;
+const rawUrl = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL;
 const key = env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !key) throw new Error('SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY müssen gesetzt sein.');
+if (!rawUrl || !key) throw new Error('SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY müssen gesetzt sein.');
 
-const sb = createClient(url, key, { auth: { persistSession: false } });
+// Nur die Basisadresse verwenden (falls versehentlich /rest/v1/ o.ä. mitkopiert wurde)
+const url = new URL(rawUrl.trim()).origin;
+const sb = createClient(url, key.trim(), { auth: { persistSession: false } });
 for (const t of ['labs', 'players', 'games'] as const) {
   const rows = JSON.parse(readFileSync(`backup/${t}.json`, 'utf8')) as object[];
   for (let i = 0; i < rows.length; i += 500) {

@@ -8,11 +8,13 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { loadEnv } from './env';
 
 const env = loadEnv();
-const url = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL;
+const rawUrl = env.SUPABASE_URL ?? env.VITE_SUPABASE_URL;
 const key = env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !key) throw new Error('SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY müssen gesetzt sein.');
+if (!rawUrl || !key) throw new Error('SUPABASE_URL und SUPABASE_SERVICE_ROLE_KEY müssen gesetzt sein.');
 
-const sb = createClient(url, key, { auth: { persistSession: false } });
+// Nur die Basisadresse verwenden (falls versehentlich /rest/v1/ o.ä. mitkopiert wurde)
+const url = new URL(rawUrl.trim()).origin;
+const sb = createClient(url, key.trim(), { auth: { persistSession: false } });
 const tables = ['labs', 'players', 'games'] as const;
 
 mkdirSync('backup', { recursive: true });

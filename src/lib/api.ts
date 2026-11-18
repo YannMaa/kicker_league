@@ -22,8 +22,10 @@ export interface Api {
   subscribe(onChange: () => void): () => void;
 }
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const rawUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
+const key = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim();
+// Nur die Basisadresse verwenden (falls versehentlich /rest/v1/ o.ä. mitkopiert wurde)
+const url = rawUrl ? new URL(rawUrl).origin : undefined;
 
 function friendlyError(e: { message?: string; code?: string } | null): Error {
   const msg = e?.message ?? 'Unbekannter Fehler';
