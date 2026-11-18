@@ -8,8 +8,8 @@ export function formatDate(iso: string) {
   const d = new Date(iso);
   const today = new Date();
   const sameDay = d.toDateString() === today.toDateString();
-  const time = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-  return sameDay ? `heute ${time}` : `${d.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} ${time}`;
+  const time = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  return sameDay ? `today ${time}` : `${d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })} ${time}`;
 }
 
 export function GameRow({ game, highlight }: { game: Game; highlight?: string }) {
@@ -20,7 +20,7 @@ export function GameRow({ game, highlight }: { game: Game; highlight?: string })
     <div className={`flex min-w-0 flex-1 items-center gap-1 ${side === 'blue' ? 'flex-row-reverse text-right' : ''}`}>
       <div className={`flex ${side === 'blue' ? 'flex-row-reverse' : ''} -space-x-2`}>
         {teamOf(game, side).map((id) => (
-          <Link key={id} to={`/spieler/${id}`}>
+          <Link key={id} to={`/players/${id}`}>
             <Avatar player={playersById.get(id)} size={30} ring={side} />
           </Link>
         ))}

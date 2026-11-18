@@ -17,6 +17,7 @@ export interface Api {
   load(): Promise<LeagueData>;
   addLab(name: string): Promise<Lab>;
   addPlayer(p: Pick<Player, 'name' | 'lab_id' | 'avatar_style' | 'avatar_seed'>): Promise<Player>;
+  archivePlayer(id: string): Promise<void>;
   addGame(g: NewGame): Promise<Game>;
   deleteGame(id: string): Promise<void>;
   subscribe(onChange: () => void): () => void;
@@ -28,8 +29,8 @@ const key = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim
 const url = rawUrl ? new URL(rawUrl).origin : undefined;
 
 function friendlyError(e: { message?: string; code?: string } | null): Error {
-  const msg = e?.message ?? 'Unbekannter Fehler';
-  if (e?.code === '23505') return new Error('Den Namen gibt es schon – bitte einen anderen wählen.');
+  const msg = e?.message ?? 'Unknown error';
+  if (e?.code === '23505') return new Error('That name is already taken – please pick another one.');
   return new Error(msg);
 }
 
@@ -65,15 +66,28 @@ function supabaseApi(sb: SupabaseClient): Api {
       if (error) throw friendlyError(error);
       return data as Player;
     },
+    async archivePlayer(id) {
+      const { data, error } = await sb
+        .from('players')
+        .update({ archived_at: new Date().toISOString() })
+        .eq('id', id)
+        .select();
+      if (error) throw friendlyError(error);
+      if (!data?.length) throw new Error('Could not remove this player (already removed?).');
+    },
     async addGame(g) {
       const { data, error } = await sb.from('games').insert(g).select().single();
       if (error) throw friendlyError(error);
       return data as Game;
     },
     async deleteGame(id) {
-      const { data, error } = await sb.from('games').delete().eq('id', id).select();
+      const { data, error } = await sb
+        .from('games')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', id)
+        .select();
       if (error) throw friendlyError(error);
-      if (!data?.length) throw new Error('Rückgängig ist nur in den ersten 5 Minuten möglich.');
+      if (!data?.length) throw new Error('Could not delete this match (already deleted?).');
     },
     subscribe(onChange) {
       // Leichtgewichtig: alle 30 s und beim Zurückkehren in den Tab neu laden.
@@ -116,7 +130,7 @@ function demoApi(): Api {
     },
     async addLab(name) {
       if (state.labs.some((l) => l.name.toLowerCase() === name.trim().toLowerCase()))
-        throw new Error('Das Lab gibt es schon.');
+        throw new Error('That lab already exists.');
       const lab = { id: id(), name: name.trim(), created_at: now() };
       state.labs.push(lab);
       save();
@@ -124,23 +138,28 @@ function demoApi(): Api {
     },
     async addPlayer(p) {
       if (state.players.some((x) => x.name.toLowerCase() === p.name.trim().toLowerCase()))
-        throw new Error('Den Namen gibt es schon – bitte einen anderen wählen.');
-      const player = { ...p, name: p.name.trim(), id: id(), created_at: now() };
+        throw new Error('That name is already taken – please pick another one.');
+      const player = { ...p, name: p.name.trim(), id: id(), created_at: now(), archived_at: null };
       state.players.push(player);
       save();
       return player;
     },
+    async archivePlayer(pid) {
+      const pl = state.players.find((x) => x.id === pid);
+      if (!pl) throw new Error('Player not found.');
+      pl.archived_at = now();
+      save();
+    },
     async addGame(g) {
-      const game = { ...g, id: id(), created_at: now() };
+      const game = { ...g, id: id(), created_at: now(), deleted_at: null };
       state.games.push(game);
       save();
       return game;
     },
     async deleteGame(gid) {
       const g = state.games.find((x) => x.id === gid);
-      if (!g || Date.now() - new Date(g.created_at).getTime() > 5 * 60_000)
-        throw new Error('Rückgängig ist nur in den ersten 5 Minuten möglich.');
-      state.games = state.games.filter((x) => x.id !== gid);
+      if (!g) throw new Error('Match not found.');
+      g.deleted_at = now();
       save();
     },
     subscribe() {

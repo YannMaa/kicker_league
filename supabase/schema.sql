@@ -19,8 +19,11 @@ create table if not exists public.players (
   avatar_seed   text not null default 'kicker'     check (char_length(avatar_seed) <= 60),
   created_at    timestamptz not null default now()
 );
--- Namen eindeutig (Groß-/Kleinschreibung egal)
-create unique index if not exists players_name_unique on public.players (lower(trim(name)));
+-- Soft-Delete: entfernte Spieler bleiben samt Spielhistorie erhalten (Wiederherstellen: archived_at auf NULL setzen)
+alter table public.players add column if not exists archived_at timestamptz;
+-- Namen eindeutig unter aktiven Spielern (Groß-/Kleinschreibung egal)
+drop index if exists public.players_name_unique;
+create unique index if not exists players_name_active_unique on public.players (lower(trim(name))) where archived_at is null;
 
 create table if not exists public.games (
   id          uuid primary key default gen_random_uuid(),
@@ -44,6 +47,8 @@ create table if not exists public.games (
     and (red_2 is null or blue_2 is null or red_2 <> blue_2)
   )
 );
+-- Soft-Delete: gelöschte Spiele bleiben in der DB/Backup, zählen aber nicht mehr (Wiederherstellen: deleted_at auf NULL setzen)
+alter table public.games add column if not exists deleted_at timestamptz;
 create index if not exists games_created_at_idx on public.games (created_at);
 
 -- ---------- Row Level Security ----------
@@ -58,6 +63,8 @@ drop policy if exists "add labs"     on public.labs;
 drop policy if exists "add players"  on public.players;
 drop policy if exists "add games"    on public.games;
 drop policy if exists "undo recent game" on public.games;
+drop policy if exists "archive player" on public.players;
+drop policy if exists "archive game" on public.games;
 
 -- Jeder darf lesen
 create policy "read labs"    on public.labs    for select to anon, authenticated using (true);
@@ -69,11 +76,15 @@ create policy "add labs"    on public.labs    for insert to anon, authenticated 
 create policy "add players" on public.players for insert to anon, authenticated with check (true);
 create policy "add games"   on public.games   for insert to anon, authenticated with check (true);
 
--- Löschen nur für frisch eingetragene Spiele (Rückgängig-Button, 5 Minuten)
-create policy "undo recent game" on public.games for delete to anon, authenticated
-  using (created_at > now() - interval '5 minutes');
+-- Spiel löschen = archivieren (deleted_at setzen). Echtes DELETE ist für anon/authenticated nicht erlaubt.
+create policy "archive game" on public.games for update to anon, authenticated
+  using (deleted_at is null) with check (deleted_at is not null);
 
--- Keine UPDATE-Policies → Ändern ist nur über das Dashboard (service_role) möglich.
+-- Spieler entfernen = archivieren. Erlaubt ist NUR das Setzen von archived_at (kein Wiederherstellen, kein Umbenennen).
+create policy "archive player" on public.players for update to anon, authenticated
+  using (archived_at is null) with check (archived_at is not null);
+
+-- Sonst keine UPDATE-Rechte → alles andere ändern nur über das Dashboard (service_role).
 
 -- ---------- Spalten-Rechte ----------
 -- Anon darf id/created_at NICHT selbst setzen (sonst könnte man Spiele „zurückdatieren“).
@@ -82,7 +93,8 @@ grant select on public.labs, public.players, public.games to anon, authenticated
 grant insert (name)                                   on public.labs    to anon, authenticated;
 grant insert (name, lab_id, avatar_style, avatar_seed) on public.players to anon, authenticated;
 grant insert (mode, red_1, red_2, blue_1, blue_2, score_red, score_blue) on public.games to anon, authenticated;
-grant delete on public.games to anon, authenticated;
+grant update (archived_at) on public.players to anon, authenticated;
+grant update (deleted_at)  on public.games   to anon, authenticated;
 
 -- ---------- Admin-Rechte (Backup/Restore, Dashboard-Korrekturen) ----------
 -- Neue Supabase-Projekte vergeben diese Rechte nicht mehr automatisch.

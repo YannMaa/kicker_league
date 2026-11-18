@@ -12,7 +12,7 @@ export function Register() {
   const { labs, reload } = useLeague();
   const nav = useNavigate();
   const [params] = useSearchParams();
-  const backToGame = params.get('zurueck') === 'spiel';
+  const backToGame = params.get('back') === 'game';
 
   const [name, setName] = useState('');
   const [labId, setLabId] = useState<string>('');
@@ -45,8 +45,8 @@ export function Register() {
         } catch {
           /* ignore */
         }
-        nav('/spiel');
-      } else nav(`/spieler/${p.id}?neu=1`);
+        nav('/game');
+      } else nav(`/players/${p.id}?new=1`);
     } catch (e) {
       setErr((e as Error).message);
       setSaving(false);
@@ -55,17 +55,17 @@ export function Register() {
 
   return (
     <form onSubmit={submit}>
-      <h1 className="mb-1 font-score text-4xl tracking-wider drop-shadow">Der Liga beitreten</h1>
-      <p className="mb-4 text-white/80">Leg dein Profil an und schon kannst du mitspielen.</p>
+      <h1 className="mb-1 font-score text-4xl tracking-wider drop-shadow">Join the league</h1>
+      <p className="mb-4 text-white/80">Create your profile and you are ready to play.</p>
 
       {/* Avatar-Vorschau */}
       <div className="mb-4 flex flex-col items-center">
         <img
           src={avatarUri(style, seed)}
-          alt="Dein Avatar"
+          alt="Your avatar"
           className="h-32 w-32 rounded-full bg-white ring-4 ring-white shadow-lg"
         />
-        <div className="mt-2 font-score text-3xl tracking-wider">{name.trim() || 'Dein Name'}</div>
+        <div className="mt-2 font-score text-3xl tracking-wider">{name.trim() || 'Your name'}</div>
       </div>
 
       <label className="mb-1 block text-sm font-bold uppercase tracking-widest text-white/80">Name</label>
@@ -73,32 +73,32 @@ export function Register() {
         className="input mb-4"
         value={name}
         maxLength={30}
-        placeholder="z.B. Kicker-Kalle"
+        placeholder="e.g. Foosball Frank"
         onChange={(e) => setName(e.target.value)}
         autoFocus
       />
 
-      <label className="mb-1 block text-sm font-bold uppercase tracking-widest text-white/80">Lab / Lehrstuhl</label>
+      <label className="mb-1 block text-sm font-bold uppercase tracking-widest text-white/80">Lab / Chair</label>
       <select className="input mb-2" value={labId} onChange={(e) => setLabId(e.target.value)}>
-        <option value="">– kein Lab / Gast –</option>
+        <option value="">– no lab / guest –</option>
         {sortedLabs.map((l) => (
           <option key={l.id} value={l.id}>
             {l.name}
           </option>
         ))}
-        <option value={NEW_LAB}>➕ Neues Lab anlegen…</option>
+        <option value={NEW_LAB}>➕ Add new lab…</option>
       </select>
       {labId === NEW_LAB && (
         <input
           className="input mb-2"
           value={newLab}
           maxLength={40}
-          placeholder="Name des Labs"
+          placeholder="Name of the lab"
           onChange={(e) => setNewLab(e.target.value)}
         />
       )}
 
-      <label className="mb-1 mt-4 block text-sm font-bold uppercase tracking-widest text-white/80">Avatar-Stil</label>
+      <label className="mb-1 mt-4 block text-sm font-bold uppercase tracking-widest text-white/80">Avatar style</label>
       <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
         {(Object.keys(AVATAR_STYLES) as AvatarStyle[]).map((s) => (
           <button
@@ -116,7 +116,7 @@ export function Register() {
       </div>
 
       <div className="mb-1 flex items-center justify-between">
-        <label className="text-sm font-bold uppercase tracking-widest text-white/80">Such dir einen aus</label>
+        <label className="text-sm font-bold uppercase tracking-widest text-white/80">Pick one</label>
         <button
           type="button"
           className="btn-ghost !py-1 text-sm"
@@ -126,7 +126,7 @@ export function Register() {
             setSeed(n[0]);
           }}
         >
-          🎲 Neu würfeln
+          🎲 Roll again
         </button>
       </div>
       <div className="mb-6 grid grid-cols-4 gap-2">
@@ -144,7 +144,7 @@ export function Register() {
 
       {err && <p className="mb-3 rounded-xl bg-red-600 p-3 font-semibold">{err}</p>}
       <button className="btn-ball w-full py-4 text-xl" disabled={!canSave}>
-        {saving ? 'Speichere…' : backToGame ? '✅ Anlegen & zurück zum Spiel' : '✅ Profil anlegen'}
+        {saving ? 'Saving…' : backToGame ? '✅ Create & back to match' : '✅ Create profile'}
       </button>
     </form>
   );

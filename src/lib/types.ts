@@ -11,6 +11,8 @@ export interface Player {
   avatar_style: string;
   avatar_seed: string;
   created_at: string;
+  /** gesetzt = Spieler wurde entfernt (Historie bleibt) */
+  archived_at: string | null;
 }
 
 export type Mode = '1v1' | '2v2';
@@ -26,6 +28,8 @@ export interface Game {
   blue_2: string | null;
   score_red: number;
   score_blue: number;
+  /** gesetzt = Spiel wurde gelöscht (bleibt im Backup, zählt nicht mehr) */
+  deleted_at: string | null;
 }
 
-export type NewGame = Omit<Game, 'id' | 'created_at'>;
+export type NewGame = Omit<Game, 'id' | 'created_at' | 'deleted_at'>;

@@ -18,6 +18,7 @@ const P = (id: string, lab: string | null = null): Player => ({
   avatar_style: 'adventurer',
   avatar_seed: id,
   created_at: '2026-01-01T00:00:00Z',
+  archived_at: null,
 });
 
 let n = 0;
@@ -31,6 +32,7 @@ const G = (red: string[], blue: string[], sr: number, sb: number, day = 1): Game
   blue_2: blue[1] ?? null,
   score_red: sr,
   score_blue: sb,
+  deleted_at: null,
 });
 
 describe('Bayes & Torfaktor', () => {

@@ -3,11 +3,11 @@ import { useLeague } from '../lib/store';
 import { resetDemo } from '../lib/api';
 
 const nav = [
-  { to: '/', label: 'Start', icon: '🏟️' },
-  { to: '/tabelle', label: 'Tabelle', icon: '📊' },
-  { to: '/spiel', label: 'Spiel', icon: '⚽', primary: true },
+  { to: '/', label: 'Home', icon: '🏟️' },
+  { to: '/table', label: 'Table', icon: '📊' },
+  { to: '/game', label: 'Match', icon: '⚽', primary: true },
   { to: '/insights', label: 'Insights', icon: '💡' },
-  { to: '/spieler/neu', label: 'Beitreten', icon: '➕' },
+  { to: '/players/new', label: 'Join', icon: '➕' },
 ];
 
 export function Layout() {
@@ -17,20 +17,20 @@ export function Layout() {
       <header className="wood no-print sticky top-0 z-20 flex items-center justify-between rounded-b-2xl px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
           <span className="text-2xl">⚽</span>
-          <span className="font-score text-3xl leading-none tracking-wider drop-shadow">AIBE KICKER-LIGA</span>
+          <span className="font-score text-3xl leading-none tracking-wider drop-shadow">AIBE FOOSBALL LEAGUE</span>
         </Link>
       </header>
       {demo && (
         <div className="no-print mx-4 mt-3 rounded-xl bg-yellow-300 px-3 py-2 text-sm font-semibold text-black">
-          Demo-Modus: Supabase ist noch nicht verbunden, die Daten liegen nur in diesem Browser.{' '}
+          Demo mode: Supabase is not connected yet, data is only stored in this browser.{' '}
           <button className="underline" onClick={() => { resetDemo(); location.reload(); }}>
-            Demo zurücksetzen
+            Reset demo
           </button>
         </div>
       )}
       {error && (
         <div className="no-print mx-4 mt-3 rounded-xl bg-red-600 px-3 py-2 text-sm font-semibold">
-          Verbindungsproblem: {error}
+          Connection problem: {error}
         </div>
       )}
       <main className="flex-1 px-4 pb-28 pt-4">

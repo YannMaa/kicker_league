@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { LeagueProvider } from './lib/store';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
@@ -16,10 +16,13 @@ export default function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="spiel" element={<NewGame />} />
-            <Route path="spieler/neu" element={<Register />} />
-            <Route path="spieler/:id" element={<Profile />} />
-            <Route path="tabelle" element={<Table />} />
+            <Route path="game" element={<NewGame />} />
+            <Route path="players/new" element={<Register />} />
+            <Route path="players/:id" element={<Profile />} />
+            <Route path="table" element={<Table />} />
+            {/* alte deutsche Adressen (z.B. bereits gescannte QR-Codes) */}
+            <Route path="spiel" element={<Navigate to="/game" replace />} />
+            <Route path="tabelle" element={<Navigate to="/table" replace />} />
             <Route path="insights" element={<Insights />} />
             <Route path="qr" element={<QrPrint />} />
             <Route path="*" element={<Home />} />

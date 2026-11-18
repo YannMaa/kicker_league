@@ -14,12 +14,12 @@ export function ScoreCounter({
       <div className={`scoreboard w-24 rounded-xl py-1 text-center text-6xl ${side === 'red' ? '!text-red-400' : '!text-sky-300'}`}>
         {value}
       </div>
-      {/* Schiebeperlen wie am echten Kicker: geschoben = gezählt */}
+      {/* Sliding beads like on a real table: moved = counted */}
       <button
         type="button"
         onClick={() => set(value + 1)}
         className="relative flex h-8 w-full max-w-[11rem] items-center rounded-full bg-black/30 px-1"
-        aria-label="Tor hinzufügen"
+        aria-label="Add goal"
       >
         <div className="rod absolute inset-x-1 top-1/2 -translate-y-1/2" />
         <div className="relative flex w-full justify-between">

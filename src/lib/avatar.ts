@@ -2,14 +2,14 @@ import { createAvatar } from '@dicebear/core';
 import { adventurer, avataaars, bigSmile, bottts, funEmoji, lorelei, pixelArt, thumbs } from '@dicebear/collection';
 
 export const AVATAR_STYLES = {
-  adventurer: { label: 'Abenteurer', style: adventurer },
+  adventurer: { label: 'Adventurer', style: adventurer },
   avataaars: { label: 'Comic', style: avataaars },
-  bigSmile: { label: 'Grinsekatze', style: bigSmile },
-  bottts: { label: 'Roboter', style: bottts },
+  bigSmile: { label: 'Big smile', style: bigSmile },
+  bottts: { label: 'Robot', style: bottts },
   funEmoji: { label: 'Emoji', style: funEmoji },
-  lorelei: { label: 'Skizze', style: lorelei },
+  lorelei: { label: 'Sketch', style: lorelei },
   pixelArt: { label: 'Pixel', style: pixelArt },
-  thumbs: { label: 'Daumen', style: thumbs },
+  thumbs: { label: 'Thumbs', style: thumbs },
 } as const;
 
 export type AvatarStyle = keyof typeof AVATAR_STYLES;

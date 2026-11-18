@@ -1,4 +1,4 @@
-# ⚽ AIBE Kicker-Liga
+# ⚽ AIBE Foosball League
 
 Tischkicker-Tabelle fürs Büro: QR-Code scannen → registrieren → Spiel eintragen → Tabelle, Elo, Insights, Trainingsempfehlungen.
 
@@ -30,7 +30,7 @@ npm test         # Tests für Elo/Tabelle/Insights
 3. Deploy. Jeder `git push` deployt automatisch neu, so änderst du die Seite jederzeit.
 
 ### 4. QR-Code
-`https://<deine-url>/qr` öffnen → **Drucken**. Der Code führt direkt auf `/spiel`.
+`https://<deine-url>/qr` öffnen → **Drucken**. Der Code führt direkt auf `/game`.
 
 ## Wiederherstellen
 Alle Statistiken werden aus den Rohdaten (labs/players/games) berechnet, nur die sind im Backup.
@@ -39,8 +39,10 @@ Alle Statistiken werden aus den Rohdaten (labs/players/games) berechnet, nur die
 3. URL/anon key in Vercel anpassen. Fertig.
 
 ## Sicherheit
-- Jeder darf lesen, Spieler/Spiele anlegen. Kein Update. Löschen nur für Spiele < 5 Min alt (Rückgängig).
-- Korrekturen/Löschungen: Supabase **Table Editor** (Admin).
+- Jeder darf lesen sowie Spieler/Spiele anlegen. Löschen nur für Spiele < 5 Min alt (Undo).
+- **Spiele löschen** = archivieren (`games.deleted_at`), echtes DELETE ist nicht erlaubt. Gelöschte Spiele zählen nicht mehr, bleiben aber im Backup. Wiederherstellen: `deleted_at` auf `NULL` setzen.
+- **Spieler entfernen** = archivieren (`players.archived_at`). Die Spielhistorie bleibt erhalten. Wiederherstellen: im Supabase **Table Editor** `archived_at` der Zeile auf `NULL` setzen.
+- Sonstige Korrekturen: Supabase **Table Editor** (Admin).
 - `service_role` key gehört nur in `.env` (lokal) und GitHub Secrets, nie ins Frontend.
 
 ## Score-System

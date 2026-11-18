@@ -9,21 +9,21 @@ export function Home() {
   const { league, playersById, games, players, loading } = useLeague();
   const ranking = sortRanking([...league.players.values()].filter((s) => s.games > 0)).slice(0, 3);
   const recent = [...games].reverse().slice(0, 5);
-  const order = [1, 0, 2]; // Podest: 2. – 1. – 3.
+  const order = [1, 0, 2]; // podium: 2nd – 1st – 3rd
   const medal = ['🥇', '🥈', '🥉'];
   return (
     <div>
-      <Link to="/spiel" className="btn-ball mb-6 w-full !py-6 text-3xl shadow-[0_6px_0_#94a3b8]">
-        ⚽ Spiel eintragen
+      <Link to="/game" className="btn-ball mb-6 w-full !py-6 text-3xl shadow-[0_6px_0_#94a3b8]">
+        ⚽ Log a match
       </Link>
 
-      <Section title="Podest">
+      <Section title="Podium">
         {loading ? (
-          <p>Lade…</p>
+          <p>Loading…</p>
         ) : ranking.length === 0 ? (
           <div className="pitch-card text-center">
-            <p className="mb-3">Noch keine Spiele. Sei der Erste!</p>
-            <Link to="/spieler/neu" className="btn-ghost">Spieler anlegen</Link>
+            <p className="mb-3">No matches yet. Be the first!</p>
+            <Link to="/players/new" className="btn-ghost">Add player</Link>
           </div>
         ) : (
           <div className="grid grid-cols-3 items-end gap-2">
@@ -31,7 +31,7 @@ export function Home() {
               const s = ranking[i];
               const p = playersById.get(s.playerId)!;
               return (
-                <Link key={s.playerId} to={`/spieler/${p.id}`} className="flex flex-col items-center">
+                <Link key={s.playerId} to={`/players/${p.id}`} className="flex flex-col items-center">
                   <span className="text-3xl">{medal[i]}</span>
                   <Avatar player={p} size={i === 0 ? 80 : 60} />
                   <span className="mt-1 max-w-full truncate font-extrabold">{p.name}</span>
@@ -45,16 +45,16 @@ export function Home() {
         )}
       </Section>
 
-      <Section title="Letzte Spiele" right={<Link to="/tabelle" className="text-sm underline">Tabelle →</Link>}>
+      <Section title="Recent matches" right={<Link to="/table" className="text-sm underline">Table →</Link>}>
         <div className="space-y-2">
           {recent.map((g) => <GameRow key={g.id} game={g} />)}
-          {!recent.length && <p className="text-white/70">Noch nichts gespielt.</p>}
+          {!recent.length && <p className="text-white/70">Nothing played yet.</p>}
         </div>
       </Section>
 
       <div className="pitch-card text-center">
-        <p className="mb-2 font-bold">{players.length} Spieler · {games.length} Spiele</p>
-        <Link to="/spieler/neu" className="btn-ghost">➕ Neu hier? Registrieren</Link>
+        <p className="mb-2 font-bold">{players.length} players · {games.length} matches</p>
+        <Link to="/players/new" className="btn-ghost">➕ New here? Register</Link>
       </div>
     </div>
   );

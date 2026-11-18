@@ -95,8 +95,8 @@ export function headToHead(games: Game[]): H2H[] {
   return [...map.values()];
 }
 
-export function biggestRivalry(games: Game[]): H2H | null {
-  const list = headToHead(games).filter((h) => h.games >= 2);
+export function biggestRivalry(games: Game[], keep?: (a: string, b: string) => boolean): H2H | null {
+  const list = headToHead(games).filter((h) => h.games >= 2 && (!keep || keep(h.a, h.b)));
   if (!list.length) return null;
   return list.sort(
     (x, y) => y.games - x.games || Math.abs(x.aWins - x.bWins) - Math.abs(y.aWins - y.bWins),
@@ -266,39 +266,39 @@ function pickText(texts: string[], seed: string): string {
 
 const TXT = {
   keeper: [
-    'Der Kasten ist offen wie die Mensa um 12 Uhr. Torwart-Training dringend empfohlen!',
-    'Gegentore pro Spiel auf Rekordniveau. Vielleicht mal die hintere Stange festhalten?',
-    'Hinten steht die Tür sperrangelweit offen. Bitte vor dem nächsten Spiel abschließen.',
+    'The goal is wide open, like the cafeteria at noon. Goalkeeper training strongly recommended!',
+    'Goals conceded per game: record high. Maybe try actually holding the back rod?',
+    'The back door is wide open. Please lock it before the next match.',
   ],
   striker: [
-    'Die Kugel will einfach nicht rein. Sturm-Coaching: 100 Schüsse pro Mittagspause.',
-    'Trifft im Moment seltener als der Drucker im 3. Stock. Zielwasser trinken!',
-    'Torgefahr: gering. Tipp: Die Kugel muss ins Tor des GEGNERS.',
+    'The ball just will not go in. Striker coaching: 100 shots every lunch break.',
+    'Scores less often than the printer on the 3rd floor. Drink some aiming water!',
+    'Goal threat: low. Pro tip: the ball has to go into the OTHER goal.',
   ],
   camp: [
-    'Trainingslager im Kicker-Raum empfohlen. Schlafsack wird gestellt.',
-    'Das Elo braucht Zuwendung. Vielleicht mit den Top-3 zusammen spielen und abschauen?',
-    'Platz an der Sonne? Eher Platz im Keller. Zeit für eine Extraschicht!',
+    'Training camp at the foosball table recommended. Sleeping bag provided.',
+    'The Elo needs some love. Maybe play with the top 3 and learn from them?',
+    'A place in the sun? More like a place in the basement. Time for extra shifts!',
   ],
   crisis: [
-    'Niederlagenserie! Krisensitzung mit dem Vorstand ist einberufen.',
-    'Der Trainerstuhl wackelt. Ein Sieg muss her, und zwar schnell!',
-    'Pechsträhne erkannt. Empfehlung: Glücksbringer mitbringen und Seite wechseln.',
+    'Losing streak! Crisis meeting with the board has been called.',
+    'The coach\u2019s chair is wobbling. A win is needed, and fast!',
+    'Bad luck streak detected. Recommendation: bring a lucky charm and switch sides.',
   ],
   injury: [
-    'Lange nicht gesehen. Verletzungspause oder heimlich trainiert?',
-    'Hat sich seit Wochen nicht am Kicker blicken lassen. Wir vermissen dich!',
-    'Vermisst: zuletzt am Kickertisch gesichtet. Hinweise an die Liga-Leitung.',
+    'Long time no see. Injured, or secretly training?',
+    'Has not been seen at the table for weeks. We miss you!',
+    'Missing person: last seen at the foosball table. Please report to the league office.',
   ],
   bench: [
-    'Registriert, aber kaum gespielt. Raus von der Bank, rein ins Spiel!',
-    'Bankdrücker-Alarm: Die Stangen warten auf dich!',
-    'Noch Rookie. Ein paar Spiele mehr und du bist offiziell in der Tabelle!',
+    'Registered, but barely played. Off the bench and into the game!',
+    'Benchwarmer alert: the rods are waiting for you!',
+    'Still a rookie. A few more matches and you are officially in the table!',
   ],
   form: [
-    'Formkurve zeigt steil nach oben. Gerade unaufhaltsam!',
-    'On fire! In der letzten Woche das meiste Elo geholt.',
-    'Lauf des Lebens! Bitte nicht stören, der Flow ist heilig.',
+    'Form curve is pointing steeply upwards. Currently unstoppable!',
+    'On fire! Collected the most Elo in the last week.',
+    'Run of a lifetime! Please do not disturb, the flow is sacred.',
   ],
 };
 
@@ -320,45 +320,45 @@ export function trainingRecommendations(league: LeagueStats, now: Date = new Dat
     const gain = recent[recent.length - 1].elo - before;
     if (gain > 0 && (!bestForm || gain > bestForm.gain)) bestForm = { s, gain };
   }
-  if (bestForm) add('form', '🔥', 'Formkurve top', bestForm.s, TXT.form, 'good');
+  if (bestForm) add('form', '🔥', 'Hot streak', bestForm.s, TXT.form, 'good');
 
   // 🧤 Torwart-Training
   const keeper = [...active].sort((a, b) => b.goalsAgainst / b.games - a.goalsAgainst / a.games)[0];
-  if (keeper) add('keeper', '🧤', 'Torwart-Training', keeper, TXT.keeper);
+  if (keeper) add('keeper', '🧤', 'Goalkeeper training', keeper, TXT.keeper);
 
   // 🎯 Sturm-Coaching
   const striker = [...active].sort((a, b) => a.goalsFor / a.games - b.goalsFor / b.games)[0];
-  if (striker && striker.playerId !== keeper?.playerId) add('striker', '🎯', 'Sturm-Coaching', striker, TXT.striker);
+  if (striker && striker.playerId !== keeper?.playerId) add('striker', '🎯', 'Striker coaching', striker, TXT.striker);
 
   // 🏕️ Trainingslager: niedrigstes Elo bei ≥ PROVISIONAL_GAMES Spielen
   const established = all.filter((s) => s.games >= PROVISIONAL_GAMES);
   if (established.length >= 3) {
     const camp = [...established].sort((a, b) => a.elo - b.elo)[0];
-    add('camp', '🏕️', 'Trainingslager empfohlen', camp, TXT.camp);
+    add('camp', '🏕️', 'Training camp recommended', camp, TXT.camp);
   }
 
   // 🚨 Krisensitzung: Niederlagenserie ≥ 3
   for (const s of all)
     if (s.currentStreak.type === 'L' && s.currentStreak.length >= 3)
-      add('crisis', '🚨', `Krisensitzung (${s.currentStreak.length} Niederlagen in Folge)`, s, TXT.crisis);
+      add('crisis', '🚨', `Crisis meeting (${s.currentStreak.length} losses in a row)`, s, TXT.crisis);
 
   // 🛋️ Verletzungspause: > 14 Tage nicht gespielt
   all
     .filter((s) => s.lastPlayed && now.getTime() - new Date(s.lastPlayed).getTime() > 14 * DAY)
     .sort((a, b) => a.lastPlayed!.localeCompare(b.lastPlayed!))
     .slice(0, 3)
-    .forEach((s) => add('injury', '🛋️', 'Verletzungspause?', s, TXT.injury));
+    .forEach((s) => add('injury', '🛋️', 'Injured?', s, TXT.injury));
 
   // 🪑 Bankdrücker: < 3 Spiele
   all
     .filter((s) => s.games < 3)
     .slice(0, 3)
-    .forEach((s) => add('bench', '🪑', 'Bankdrücker', s, TXT.bench));
+    .forEach((s) => add('bench', '🪑', 'Benchwarmer', s, TXT.bench));
 
   return recs;
 }
 
-// ---------------------------------------------------------------- Sprüche nach dem Spiel
+// ---------------------------------------------------------------- Quips after a match
 export function resultQuip(game: Game, underdogWin: boolean): string {
   const diff = Math.abs(game.score_red - game.score_blue);
   const loserScore = Math.min(game.score_red, game.score_blue);
@@ -366,41 +366,41 @@ export function resultQuip(game: Game, underdogWin: boolean): string {
   if (loserScore === 0)
     return pickText(
       [
-        'ZU NULL! Ab unter den Tisch mit euch! 🫣',
-        'Höchststrafe! Die Verlierer kennen jetzt die Unterseite des Kickers.',
-        'Zu-Null-Sieg. Das wird in der Hall of Shame verewigt.',
+        'SHUTOUT! Under the table with you! 🫣',
+        'Maximum penalty! The losers now know what the underside of the table looks like.',
+        'A clean sheet win. This goes straight into the Hall of Shame.',
       ],
       seed,
     );
   if (underdogWin)
     return pickText(
       [
-        'David schlägt Goliath! Underdog-Sieg, das gibt Extra-Elo. 🐶',
-        'Sensation! Die Buchmacher sind fassungslos.',
-        'Niemand hat damit gerechnet, nicht mal die Gewinner selbst.',
+        'David beats Goliath! Underdog win, that means bonus Elo. 🐶',
+        'Sensation! The bookmakers are speechless.',
+        'Nobody saw that coming, not even the winners themselves.',
       ],
       seed,
     );
   if (diff === 1)
     return pickText(
       [
-        'Knapper geht es nicht! Ein echter Krimi. 🍿',
-        'Ein Tor Unterschied. Das Rückspiel wird heiß!',
-        'Nervenkitzel pur. Puls bei 180.',
+        'It cannot get any closer! A real thriller. 🍿',
+        'One goal difference. The rematch is going to be hot!',
+        'Pure suspense. Heart rate at 180.',
       ],
       seed,
     );
   if (diff >= 6)
     return pickText(
       [
-        'Klare Sache! Das war eine Lehrstunde. 📚',
-        'Deutlicher Sieg. Die Verlierer sollten mal auf die Trainingsseite schauen.',
-        'Dominanz pur! Die Stangen glühen noch.',
+        'Clear-cut! That was a masterclass. 📚',
+        'A decisive win. The losers should check out the training plan.',
+        'Pure dominance! The rods are still glowing.',
       ],
       seed,
     );
   return pickText(
-    ['Starkes Spiel! Ab in die Tabelle damit. ⚽', 'Verdienter Sieg! Nächste Runde?', 'Gut gekickt! Die Tabelle bebt.'],
+    ['Great match! Into the table it goes. ⚽', 'Well deserved win! Next round?', 'Nicely played! The table is shaking.'],
     seed,
   );
 }

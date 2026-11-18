@@ -8,6 +8,7 @@ import type { Game, Mode, Side } from '../lib/types';
 import { Avatar } from '../components/Avatar';
 import { PlayerPicker } from '../components/PlayerPicker';
 import { ScoreCounter } from '../components/ScoreCounter';
+import { MatchHistory } from '../components/MatchHistory';
 
 type Slot = 'red_1' | 'red_2' | 'blue_1' | 'blue_2';
 interface Draft {
@@ -41,14 +42,16 @@ function ssSet(key: string, v: unknown) {
 }
 
 const slotLabel: Record<Slot, string> = {
-  red_1: 'Abwehr',
-  red_2: 'Sturm',
-  blue_1: 'Abwehr',
-  blue_2: 'Sturm',
+  red_1: 'Defense',
+  red_2: 'Attack',
+  blue_1: 'Defense',
+  blue_2: 'Attack',
 };
 
 export function NewGame() {
   const { playersById, reload, league } = useLeague();
+  // Entfernte Spieler (z.B. aus einem gespeicherten Entwurf) zählen als leerer Slot
+  const isActive = (id: string | null) => !!id && league.players.has(id);
   const [draft, setDraft] = useState<Draft>(() => {
     const d = ss<Draft>(DRAFT_KEY) ?? emptyDraft();
     // Frisch registrierte:n Spieler:in direkt in den gewählten Slot setzen
@@ -70,8 +73,8 @@ export function NewGame() {
   }, [picking]);
 
   const activeSlots: Slot[] = draft.mode === '2v2' ? ['red_1', 'red_2', 'blue_1', 'blue_2'] : ['red_1', 'blue_1'];
-  const taken = activeSlots.map((s) => draft.slots[s]).filter((x): x is string => !!x);
-  const complete = activeSlots.every((s) => draft.slots[s]);
+  const taken = activeSlots.map((s) => draft.slots[s]).filter((x): x is string => isActive(x));
+  const complete = activeSlots.every((s) => isActive(draft.slots[s]));
   const valid = complete && draft.red !== draft.blue;
 
   const setSlot = (slot: Slot, id: string | null) => setDraft((d) => ({ ...d, slots: { ...d.slots, [slot]: id } }));
@@ -113,7 +116,7 @@ export function NewGame() {
   }
 
   const slotButton = (slot: Slot, side: Side) => {
-    const p = draft.slots[slot] ? playersById.get(draft.slots[slot]!) : null;
+    const p = isActive(draft.slots[slot]) ? playersById.get(draft.slots[slot]!) : null;
     const s = p ? league.players.get(p.id) : null;
     return (
       <div className="relative">
@@ -128,7 +131,7 @@ export function NewGame() {
             <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">{slotLabel[slot]}</span>
           )}
           <Avatar player={p} size={56} ring={side} />
-          <span className="w-full truncate text-center text-sm font-extrabold">{p?.name ?? 'Spieler wählen'}</span>
+          <span className="w-full truncate text-center text-sm font-extrabold">{p?.name ?? 'Pick player'}</span>
           {s && <span className="text-[10px] text-white/60">Elo {Math.round(s.elo)}</span>}
         </button>
         {p && (
@@ -136,7 +139,7 @@ export function NewGame() {
             type="button"
             onClick={() => setSlot(slot, null)}
             className="absolute -right-1 -top-1 h-6 w-6 rounded-full bg-black/70 text-sm"
-            aria-label="Entfernen"
+            aria-label="Remove"
           >
             ×
           </button>
@@ -147,7 +150,7 @@ export function NewGame() {
 
   return (
     <div>
-      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">Spiel eintragen</h1>
+      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">Log a match</h1>
 
       {/* Modus */}
       <div className="wood mb-4 grid grid-cols-2 gap-1 rounded-2xl p-1">
@@ -170,12 +173,12 @@ export function NewGame() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/70" />
         <div className="relative grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="rounded-lg bg-red-team py-1 text-center font-score text-xl tracking-widest">TEAM ROT</div>
+            <div className="rounded-lg bg-red-team py-1 text-center font-score text-xl tracking-widest">TEAM RED</div>
             {slotButton('red_1', 'red')}
             {draft.mode === '2v2' && slotButton('red_2', 'red')}
           </div>
           <div className="space-y-2">
-            <div className="rounded-lg bg-blue-team py-1 text-center font-score text-xl tracking-widest">TEAM BLAU</div>
+            <div className="rounded-lg bg-blue-team py-1 text-center font-score text-xl tracking-widest">TEAM BLUE</div>
             {slotButton('blue_1', 'blue')}
             {draft.mode === '2v2' && slotButton('blue_2', 'blue')}
           </div>
@@ -188,22 +191,24 @@ export function NewGame() {
 
       <div className="mt-3 flex justify-center">
         <button className="text-sm font-bold text-white/80 underline" onClick={swapSides}>
-          ⇄ Seiten tauschen
+          ⇄ Swap sides
         </button>
       </div>
 
       {err && <p className="mt-3 rounded-xl bg-red-600 p-3 font-semibold">{err}</p>}
       {complete && draft.red === draft.blue && (
-        <p className="mt-3 text-center text-sm text-yellow-200">Unentschieden gibt’s beim Kicker nicht. Weiterspielen! 😉</p>
+        <p className="mt-3 text-center text-sm text-yellow-200">No draws in foosball. Keep playing! 😉</p>
       )}
 
       <button className="btn-ball mt-4 w-full py-4 text-xl" disabled={!valid || saving} onClick={save}>
-        {saving ? 'Speichere…' : '✅ Ergebnis speichern'}
+        {saving ? 'Saving…' : '✅ Save result'}
       </button>
+
+      <MatchHistory />
 
       <PlayerPicker
         open={!!picking}
-        title={picking ? `${picking.startsWith('red') ? 'Rot' : 'Blau'}${draft.mode === '2v2' ? ' – ' + slotLabel[picking] : ''}` : ''}
+        title={picking ? `${picking.startsWith('red') ? 'Red' : 'Blue'}${draft.mode === '2v2' ? ' – ' + slotLabel[picking] : ''}` : ''}
         taken={taken}
         onClose={() => setPicking(null)}
         onPick={(p) => {
@@ -218,12 +223,7 @@ export function NewGame() {
 
 function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void; onAgain: () => void }) {
   const { playersById, league, reload } = useLeague();
-  const [left, setLeft] = useState(() => Math.max(0, 300 - Math.floor((Date.now() - new Date(game.created_at).getTime()) / 1000)));
   const [err, setErr] = useState<string | null>(null);
-  useEffect(() => {
-    const iv = setInterval(() => setLeft((l) => Math.max(0, l - 1)), 1000);
-    return () => clearInterval(iv);
-  }, []);
   const w = winnerOf(game);
   const r = league.gameRatings.get(game.id);
   const underdog = !!r && (w === 'red' ? r.redExpected < 0.4 : r.redExpected > 0.6);
@@ -245,7 +245,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
     const d = r?.deltas[id] ?? 0;
     const s = league.players.get(id);
     return (
-      <Link to={`/spieler/${id}`} key={id} className="flex items-center gap-3 rounded-xl bg-black/20 p-2">
+      <Link to={`/players/${id}`} key={id} className="flex items-center gap-3 rounded-xl bg-black/20 p-2">
         <Avatar player={p} size={40} />
         <span className="flex-1 font-bold">{p?.name}</span>
         <span className="text-sm text-white/70">{s ? Math.round(s.elo) : ''}</span>
@@ -261,7 +261,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
     <div className="text-center">
       <div className="mb-2 text-6xl">{underdog ? '🐶' : '🏆'}</div>
       <h1 className="font-score text-5xl tracking-wider drop-shadow">
-        Team {w === 'red' ? 'Rot' : 'Blau'} gewinnt!
+        Team {w === 'red' ? 'Red' : 'Blue'} wins!
       </h1>
       <div className="scoreboard mx-auto my-3 inline-block rounded-xl px-6 text-6xl">
         {game.score_red} : {game.score_blue}
@@ -269,7 +269,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
       <p className="mx-auto mb-4 max-w-sm text-lg font-semibold">{resultQuip(game, underdog)}</p>
 
       <div className="pitch-card mb-4 space-y-2 text-left">
-        <div className="text-xs font-bold uppercase tracking-widest text-white/70">Elo-Änderungen</div>
+        <div className="text-xs font-bold uppercase tracking-widest text-white/70">Elo changes</div>
         {winners.map(row)}
         <div className="rod my-2" />
         {losers.map(row)}
@@ -278,16 +278,14 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
       {err && <p className="mb-3 rounded-xl bg-red-600 p-3 font-semibold">{err}</p>}
       <div className="grid gap-3">
         <button className="btn-ball py-4 text-lg" onClick={onAgain}>
-          🔁 Revanche (gleiche Teams)
+          🔁 Rematch (same teams)
         </button>
         <Link to="/tabelle" className="btn-ghost">
-          📊 Zur Tabelle
+          📊 To the table
         </Link>
-        {left > 0 && (
-          <button className="text-sm text-white/70 underline" onClick={undo}>
-            Vertippt? Spiel rückgängig machen ({Math.floor(left / 60)}:{String(left % 60).padStart(2, '0')})
-          </button>
-        )}
+        <button className="text-sm text-white/70 underline" onClick={undo}>
+          Mistake? Undo this match
+        </button>
       </div>
     </div>
   );

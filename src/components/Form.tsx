@@ -6,7 +6,7 @@ export function FormDots({ form }: { form: Result[] }) {
       {form.map((r, i) => (
         <span
           key={i}
-          title={r === 'W' ? 'Sieg' : 'Niederlage'}
+          title={r === 'W' ? 'Win' : 'Loss'}
           className={`inline-block h-2.5 w-2.5 rounded-full ${r === 'W' ? 'bg-lime-300' : 'bg-red-500'}`}
         />
       ))}

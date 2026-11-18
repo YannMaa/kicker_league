@@ -37,10 +37,22 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
   }, [reload]);
 
   const value = useMemo<Store>(() => {
-    const league = computeLeague(data.players, data.games);
+    // Elo wird über die komplette Historie berechnet (auch mit entfernten Spielern) …
+    const games = data.games.filter((g) => !g.deleted_at); // gelöschte Spiele zählen nicht
+    const full = computeLeague(data.players, games);
+    const activePlayers = data.players.filter((p) => !p.archived_at);
+    const activeIds = new Set(activePlayers.map((p) => p.id));
+    // … entfernte Spieler erscheinen aber nirgends in Tabelle, Auswahl oder Insights.
+    const league: LeagueStats = {
+      ...full,
+      players: new Map([...full.players].filter(([id]) => activeIds.has(id))),
+    };
     return {
       ...data,
+      games,
+      players: activePlayers,
       league,
+      // alle Spieler (auch entfernte), damit alte Spiele weiterhin Namen anzeigen
       playersById: new Map(data.players.map((p) => [p.id, p])),
       labsById: new Map(data.labs.map((l) => [l.id, l])),
       loading,

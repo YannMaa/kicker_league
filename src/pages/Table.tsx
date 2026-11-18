@@ -13,9 +13,9 @@ export function Table() {
   const pct = (x: number) => `${Math.round(x * 100)}%`;
   return (
     <div>
-      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">{mode === 'table' ? 'Tabelle' : 'Elo-Ranking'}</h1>
+      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">{mode === 'table' ? 'League table' : 'Elo ranking'}</h1>
       <div className="wood mb-4 grid grid-cols-2 gap-1 rounded-2xl p-1">
-        {([['table', 'Tabelle (Punkte)'], ['elo', 'Ranking (Elo)']] as const).map(([m, l]) => (
+        {([['table', 'Table (points)'], ['elo', 'Ranking (Elo)']] as const).map(([m, l]) => (
           <button key={m} onClick={() => setMode(m)} className={`rounded-xl py-2 font-bold ${mode === m ? 'bg-white text-black' : 'text-white/90'}`}>{l}</button>
         ))}
       </div>
@@ -24,12 +24,12 @@ export function Table() {
           <thead className="bg-black/40 text-xs uppercase tracking-wider text-white/80">
             <tr>
               <th className="p-2 text-left">#</th>
-              <th className="p-2 text-left">Spieler</th>
-              <th className="p-2">Sp</th><th className="p-2">S</th><th className="p-2">N</th>
-              <th className="p-2">Tore</th><th className="p-2">TD</th>
-              <th className="p-2">Pkt</th>
-              <th className="p-2">{mode === 'elo' ? 'Elo' : 'Elo'}</th>
-              {mode === 'elo' && <th className="p-2">Quote</th>}
+              <th className="p-2 text-left">Player</th>
+              <th className="p-2" title="Played">P</th><th className="p-2" title="Wins">W</th><th className="p-2" title="Losses">L</th>
+              <th className="p-2">Goals</th><th className="p-2" title="Goal difference">GD</th>
+              <th className="p-2" title="Points">Pts</th>
+              <th className="p-2">Elo</th>
+              {mode === 'elo' && <th className="p-2">Win %</th>}
               <th className="p-2">Form</th>
             </tr>
           </thead>
@@ -41,7 +41,7 @@ export function Table() {
                 <tr key={s.playerId} className={`border-t border-white/10 text-center ${s.provisional && mode === 'elo' ? 'opacity-60' : ''}`}>
                   <td className="p-2 text-left font-score text-xl">{i + 1}</td>
                   <td className="p-2 text-left">
-                    <Link to={`/spieler/${p.id}`} className="flex items-center gap-2">
+                    <Link to={`/players/${p.id}`} className="flex items-center gap-2">
                       <Avatar player={p} size={32} />
                       <span className="min-w-0">
                         <span className="block truncate font-bold">{p.name}{s.provisional && <span className="ml-1 rounded bg-yellow-300 px-1 text-[9px] font-extrabold text-black">ROOKIE</span>}</span>
@@ -59,13 +59,13 @@ export function Table() {
                 </tr>
               );
             })}
-            {!rows.length && <tr><td colSpan={11} className="p-6 text-center text-white/70">Noch keine Spieler.</td></tr>}
+            {!rows.length && <tr><td colSpan={11} className="p-6 text-center text-white/70">No players yet.</td></tr>}
           </tbody>
         </table>
       </div>
       <p className="mt-3 text-xs text-white/70">
-        Tabelle: Sieg = 1 Punkt, dann Tordifferenz. Elo: berücksichtigt Gegnerstärke und Torabstand; unter 5 Spielen gilt man als Rookie.
-        Quote = Siegquote, geglättet (1 Sieg aus 1 Spiel ≠ 100 %).
+        Table: win = 1 point, then goal difference. Elo accounts for opponent strength and margin of victory; under 5 matches you are a rookie.
+        Win % is smoothed (1 win from 1 match ≠ 100 %). Tap a player to see their profile.
       </p>
     </div>
   );

@@ -9,7 +9,7 @@ export function demoData(): LeagueData {
   const start = Date.now() - 24 * day;
   const iso = (t: number) => new Date(t).toISOString();
 
-  const labs: Lab[] = ['Lab Robotik', 'Lab Machine Learning', 'Lab Data Science', 'Lab Embedded'].map((name, i) => ({
+  const labs: Lab[] = ['Robotics Lab', 'Machine Learning Lab', 'Data Science Lab', 'Embedded Lab'].map((name, i) => ({
     id: `demo-lab-${i}`,
     name,
     created_at: iso(start),
@@ -33,6 +33,7 @@ export function demoData(): LeagueData {
     avatar_style: style,
     avatar_seed: name.toLowerCase(),
     created_at: iso(start),
+    archived_at: null,
   }));
   const totalGames = 45;
   const games: Game[] = [];
@@ -57,6 +58,7 @@ export function demoData(): LeagueData {
       blue_2: two ? players[blue[1]].id : null,
       score_red: redWins ? 10 : loser,
       score_blue: redWins ? loser : 10,
+      deleted_at: null,
     });
   }
   return { labs, players, games };
