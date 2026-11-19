@@ -32,7 +32,7 @@ export function GameRow({ game, highlight }: { game: Game; highlight?: string })
       </div>
     </div>
   );
-  const delta = highlight && rating ? rating.deltas[highlight] : undefined;
+  const gain = highlight && rating ? (rating.gains[highlight] ?? 0) : undefined;
   return (
     <div className="flex items-center gap-2 rounded-xl bg-black/20 px-2 py-2">
       {team('red')}
@@ -42,10 +42,9 @@ export function GameRow({ game, highlight }: { game: Game; highlight?: string })
           <span className={w === 'blue' ? '' : 'opacity-60'}>{game.score_blue}</span>
         </div>
         <span className="text-[10px] text-white/60">{formatDate(game.created_at)}</span>
-        {delta !== undefined && (
-          <span className={`text-[10px] font-bold ${delta >= 0 ? 'text-lime-300' : 'text-red-300'}`}>
-            {delta >= 0 ? '+' : ''}
-            {delta.toFixed(1)} Elo
+        {gain !== undefined && (
+          <span className={`text-[10px] font-bold ${gain > 0 ? 'text-lime-300' : 'text-white/50'}`}>
+            {gain > 0 ? `▲ ${gain.toFixed(2)} LK` : 'LK unchanged'}
           </span>
         )}
       </div>

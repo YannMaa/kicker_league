@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLeague } from '../lib/store';
-import { sortRanking } from '../lib/rating';
+import { formatLk, sortRanking } from '../lib/rating';
 import { Avatar } from '../components/Avatar';
 import { GameRow } from '../components/GameRow';
 import { Section } from '../components/Section';
@@ -36,7 +36,7 @@ export function Home() {
                   <Avatar player={p} size={i === 0 ? 80 : 60} />
                   <span className="mt-1 max-w-full truncate font-extrabold">{p.name}</span>
                   <div className={`wood mt-1 flex w-full items-center justify-center rounded-t-lg font-score text-3xl ${i === 0 ? 'h-20' : i === 1 ? 'h-14' : 'h-10'}`}>
-                    {Math.round(s.elo)}
+                    {formatLk(s.lk)}
                   </div>
                 </Link>
               );

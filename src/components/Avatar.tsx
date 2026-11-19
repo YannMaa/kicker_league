@@ -2,7 +2,7 @@ import { avatarUri } from '../lib/avatar';
 import type { Player } from '../lib/types';
 
 export function Avatar({ player, size = 40, ring }: { player?: Player | null; size?: number; ring?: 'red' | 'blue' }) {
-  const ringCls = ring === 'red' ? 'ring-red-team' : ring === 'blue' ? 'ring-blue-team' : 'ring-white/80';
+  const ringCls = ring === 'red' ? 'ring-team-black' : ring === 'blue' ? 'ring-team-white' : 'ring-white/80';
   if (!player)
     return (
       <div

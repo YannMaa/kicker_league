@@ -7,11 +7,15 @@ export function ScoreCounter({
   onChange: (v: number) => void;
   side: 'red' | 'blue';
 }) {
-  const color = side === 'red' ? 'bg-red-team' : 'bg-blue-team';
+  // intern: 'red' = Team Black, 'blue' = Team White
+  const color =
+    side === 'red'
+      ? 'bg-team-black text-white border-2 border-white/60'
+      : 'bg-team-white text-black shadow-[0_4px_0_#94a3b8]';
   const set = (v: number) => onChange(Math.max(0, Math.min(99, v)));
   return (
     <div className="flex flex-col items-center gap-2">
-      <div className={`scoreboard w-24 rounded-xl py-1 text-center text-6xl ${side === 'red' ? '!text-red-400' : '!text-sky-300'}`}>
+      <div className={`scoreboard w-24 rounded-xl py-1 text-center text-6xl ${side === 'red' ? '!text-slate-400' : '!text-white'}`}>
         {value}
       </div>
       {/* Sliding beads like on a real table: moved = counted */}
@@ -39,7 +43,7 @@ export function ScoreCounter({
         <button type="button" className="btn-ghost h-12 w-12 !p-0 text-2xl" onClick={() => set(value - 1)}>
           −
         </button>
-        <button type="button" className={`btn ${color} h-12 w-12 !p-0 text-2xl text-white`} onClick={() => set(value + 1)}>
+        <button type="button" className={`btn ${color} h-12 w-12 !p-0 text-2xl`} onClick={() => set(value + 1)}>
           +
         </button>
         <button type="button" className="btn-ball h-12 !px-3 text-lg" onClick={() => set(10)}>

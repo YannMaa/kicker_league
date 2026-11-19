@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { formatLk } from '../lib/rating';
 import { useLeague } from '../lib/store';
 import { bestDuo, biggestRivalry, duoStats, labStats, records, trainingRecommendations, worstDuo } from '../lib/insights';
 import { Avatar } from '../components/Avatar';
@@ -81,7 +82,7 @@ export function Insights() {
               <span className="font-score text-4xl">{i === 0 ? '👑' : i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-extrabold">{l.name}</div>
-                <div className="text-sm text-white/70">Avg Elo {Math.round(l.avgElo)} · {l.wins} wins · {l.activePlayers} players</div>
+                <div className="text-sm text-white/70">Avg LK {formatLk(l.avgLk)} · {l.wins} wins · {l.activePlayers} players</div>
                 {l.bestPlayerId && <div className="text-sm">Best: <b>{pn(l.bestPlayerId)}</b></div>}
               </div>
               {l.bestPlayerId && <Avatar player={P(l.bestPlayerId)} size={40} />}
@@ -96,9 +97,9 @@ export function Insights() {
           {rec.mostWins && <Card emoji="🏆" title="Most wins"><One id={rec.mostWins.playerId} extra={`${rec.mostWins.wins} wins`} /></Card>}
           {rec.mostGames && <Card emoji="🔁" title="Table regular"><One id={rec.mostGames.playerId} extra={`${rec.mostGames.games} matches`} /></Card>}
           {rec.longestStreak && <Card emoji="🔥" title="Longest win streak"><One id={rec.longestStreak.playerId} extra={`${rec.longestStreak.longestWinStreak} wins in a row`} /></Card>}
-          {rec.underdog && <Card emoji="🐶" title="Biggest underdog win"><GameRow game={rec.underdog.game} /><div className="mt-1 text-xs text-white/70">Elo deficit: {Math.round(rec.underdog.eloGap)}</div></Card>}
+          {rec.underdog && <Card emoji="🐶" title="Biggest underdog win"><GameRow game={rec.underdog.game} /><div className="mt-1 text-xs text-white/70">LK gap: {rec.underdog.lkGap.toFixed(1)}</div></Card>}
           {rec.biggestWin && <Card emoji="💥" title="Biggest win"><GameRow game={rec.biggestWin} /></Card>}
-          <Card emoji="🔴🔵" title="Red vs. Blue">
+          <Card emoji="⚫⚪" title="Black vs. White">
             <div className="scoreboard rounded-md px-3 text-center text-4xl">{rec.sides.red} : {rec.sides.blue}</div>
             <div className="mt-1 text-center text-sm text-white/70">{rec.totalGames} matches · {rec.totalGoals} goals</div>
           </Card>

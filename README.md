@@ -1,6 +1,6 @@
 # ⚽ AIBE Foosball League
 
-Tischkicker-Tabelle fürs Büro: QR-Code scannen → registrieren → Spiel eintragen → Tabelle, Elo, Insights, Trainingsempfehlungen.
+Tischkicker-Tabelle fürs Büro: QR-Code scannen → registrieren → Spiel eintragen → Tabelle, LK, Insights, Trainingsempfehlungen.
 
 **Stack:** Vite + React + TypeScript + Tailwind · Supabase (Postgres) · Vercel (Hosting) · GitHub Actions (tägliches Backup)
 
@@ -8,7 +8,7 @@ Tischkicker-Tabelle fürs Büro: QR-Code scannen → registrieren → Spiel eint
 ```bash
 npm install
 npm run dev      # → Demo-Modus mit Beispieldaten im Browser
-npm test         # Tests für Elo/Tabelle/Insights
+npm test         # Tests für LK/Tabelle/Insights
 ```
 
 ## Einrichtung (einmalig, ca. 15 Min)
@@ -47,6 +47,12 @@ Alle Statistiken werden aus den Rohdaten (labs/players/games) berechnet, nur die
 
 ## Score-System
 - **Tabelle:** Sieg 1 Punkt → Tordifferenz → geschossene Tore.
-- **Elo:** Start 1000, Teamschnitt, Torfaktor `1+ln(1+|TD|)/3`, K=40 (erste 10 Spiele) dann 24. Unter 5 Spielen = Rookie.
-- **Quote:** `(Siege+2,5)/(Spiele+5)`.
-Formeln in `src/lib/rating.ts`, Konstanten oben in der Datei.
+- **LK (Leistungsklasse)** nach dem Verfahren des Deutschen Tennis Bundes (Durchführungsbestimmungen zur LKO, Stand 01.01.2024):
+  - LK 1,5 = beste, 25 = schlechteste Stufe, Anzeige mit einer Nachkommastelle (abgeschnitten). Start bei **LK 24,0**.
+  - **Nur der Sieger verbessert sich**, um `P / H`; der Verlierer bleibt unverändert.
+    `P` (10 … 110) hängt von der LK-Differenz der Gegner ab (Sieg gegen Stärkere = mehr Punkte), `H = 10 × (30 − LK)` ist die Hürde (je besser, desto mehr Punkte pro Stufe).
+  - **Doppel:** Team-LK = Durchschnitt der Partner. `P / H` wird einmal berechnet und **je zur Hälfte** auf beide Sieger verteilt.
+  - **Wöchentlich** werden alle LK um 0,025 schlechter (Motivationsaufschlag, max. 25). Spiele einer Woche werden gegen die LK vom Wochenanfang bewertet.
+  - Nicht übernommen: Altersfaktor, Zählweisenfaktor, Mannschafts-/Meisterschaftsboni, Nichtantreten, Erlass des Aufschlags nach 12 Monaten Pause.
+  - Das Tor-Ergebnis zählt, wie im Tennis, nur für Sieg/Niederlage, nicht für die LK. Es zählt für Tabelle und Tordifferenz.
+Formeln und Konstanten stehen in `src/lib/rating.ts`. Alles wird aus den Spielen berechnet, nichts davon ist in der Datenbank gespeichert.

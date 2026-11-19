@@ -164,7 +164,7 @@ export interface LabStat {
   activePlayers: number;
   games: number;
   wins: number;
-  avgElo: number;
+  avgLk: number;
   bayes: number;
   bestPlayerId: string | null;
 }
@@ -180,7 +180,7 @@ export function labStats(labs: Lab[], players: Player[], league: LeagueStats): L
     const games = members.reduce((s, m) => s + m.games, 0);
     const wins = members.reduce((s, m) => s + m.wins, 0);
     const best = [...members].sort(
-      (a, b) => Number(a.provisional) - Number(b.provisional) || b.elo - a.elo,
+      (a, b) => a.lk - b.lk || b.wins - a.wins,
     )[0];
     out.push({
       labId: lab.id,
@@ -188,12 +188,12 @@ export function labStats(labs: Lab[], players: Player[], league: LeagueStats): L
       activePlayers: members.length,
       games,
       wins,
-      avgElo: members.reduce((s, m) => s + m.elo, 0) / members.length,
+      avgLk: members.reduce((s, m) => s + m.lk, 0) / members.length,
       bayes: bayesRate(wins, games),
       bestPlayerId: best?.playerId ?? null,
     });
   }
-  return out.sort((a, b) => b.avgElo - a.avgElo || b.wins - a.wins);
+  return out.sort((a, b) => a.avgLk - b.avgLk || b.wins - a.wins);
 }
 
 // ---------------------------------------------------------------- Rekorde
@@ -205,7 +205,7 @@ export interface Records {
   longestStreak: PlayerStats | null;
   biggestWin: Game | null;
   shutouts: Game[];
-  underdog: { game: Game; eloGap: number } | null;
+  underdog: { game: Game; lkGap: number } | null;
   sides: { red: number; blue: number };
 }
 
@@ -224,10 +224,7 @@ export function records(games: Game[], league: LeagueStats): Records {
     const winner = winnerOf(g);
     sides[winner]++;
     const r = league.gameRatings.get(g.id);
-    if (r) {
-      const gap = winner === 'red' ? r.blueElo - r.redElo : r.redElo - r.blueElo;
-      if (gap > 0 && (!underdog || gap > underdog.eloGap)) underdog = { game: g, eloGap: gap };
-    }
+    if (r && r.lkDiff > 0 && (!underdog || r.lkDiff > underdog.lkGap)) underdog = { game: g, lkGap: r.lkDiff };
   }
   const mostWins = pick((s) => s.wins);
   const longestStreak = pick((s) => s.longestWinStreak);
@@ -277,7 +274,7 @@ const TXT = {
   ],
   camp: [
     'Training camp at the foosball table recommended. Sleeping bag provided.',
-    'The Elo needs some love. Maybe play with the top 3 and learn from them?',
+    'Your LK needs some love. Maybe play with the top 3 and learn from them?',
     'A place in the sun? More like a place in the basement. Time for extra shifts!',
   ],
   crisis: [
@@ -297,7 +294,7 @@ const TXT = {
   ],
   form: [
     'Form curve is pointing steeply upwards. Currently unstoppable!',
-    'On fire! Collected the most Elo in the last week.',
+    'On fire! Gained the most LK in the last week.',
     'Run of a lifetime! Please do not disturb, the flow is sacred.',
   ],
 };
@@ -309,15 +306,15 @@ export function trainingRecommendations(league: LeagueStats, now: Date = new Dat
   const add = (key: string, emoji: string, title: string, s: PlayerStats, pool: string[], tone: 'bad' | 'good' = 'bad') =>
     recs.push({ key: `${key}-${s.playerId}`, emoji, title, playerId: s.playerId, text: pickText(pool, s.playerId + key), tone });
 
-  // 🔥 Formkurve: größter Elo-Gewinn der letzten 7 Tage
+  // 🔥 Formkurve: größte LK-Verbesserung der letzten 7 Tage
   const since = now.getTime() - 7 * DAY;
   let bestForm: { s: PlayerStats; gain: number } | null = null;
   for (const s of all) {
-    const hist = league.eloHistory.get(s.playerId) ?? [];
-    const before = [...hist].reverse().find((p) => new Date(p.t).getTime() < since)?.elo ?? hist[0]?.elo;
+    const hist = league.lkHistory.get(s.playerId) ?? [];
+    const before = [...hist].reverse().find((p) => new Date(p.t).getTime() < since)?.lk ?? hist[0]?.lk;
     const recent = hist.filter((p) => new Date(p.t).getTime() >= since);
     if (!recent.length || before === undefined) continue;
-    const gain = recent[recent.length - 1].elo - before;
+    const gain = before - recent[recent.length - 1].lk; // kleinere LK = Verbesserung
     if (gain > 0 && (!bestForm || gain > bestForm.gain)) bestForm = { s, gain };
   }
   if (bestForm) add('form', '🔥', 'Hot streak', bestForm.s, TXT.form, 'good');
@@ -330,10 +327,10 @@ export function trainingRecommendations(league: LeagueStats, now: Date = new Dat
   const striker = [...active].sort((a, b) => a.goalsFor / a.games - b.goalsFor / b.games)[0];
   if (striker && striker.playerId !== keeper?.playerId) add('striker', '🎯', 'Striker coaching', striker, TXT.striker);
 
-  // 🏕️ Trainingslager: niedrigstes Elo bei ≥ PROVISIONAL_GAMES Spielen
+  // 🏕️ Trainingslager: schlechteste LK bei ≥ PROVISIONAL_GAMES Spielen
   const established = all.filter((s) => s.games >= PROVISIONAL_GAMES);
   if (established.length >= 3) {
-    const camp = [...established].sort((a, b) => a.elo - b.elo)[0];
+    const camp = [...established].sort((a, b) => b.lk - a.lk)[0];
     add('camp', '🏕️', 'Training camp recommended', camp, TXT.camp);
   }
 
@@ -375,7 +372,7 @@ export function resultQuip(game: Game, underdogWin: boolean): string {
   if (underdogWin)
     return pickText(
       [
-        'David beats Goliath! Underdog win, that means bonus Elo. 🐶',
+        'David beats Goliath! Underdog win, that means a big LK jump. 🐶',
         'Sensation! The bookmakers are speechless.',
         'Nobody saw that coming, not even the winners themselves.',
       ],

@@ -16,6 +16,7 @@ export interface Player {
 }
 
 export type Mode = '1v1' | '2v2';
+/** Intern/DB-Namen bleiben aus Kompatibilität: 'red' = Team Black, 'blue' = Team White. */
 export type Side = 'red' | 'blue';
 
 export interface Game {

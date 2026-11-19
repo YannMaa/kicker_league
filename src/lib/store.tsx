@@ -37,7 +37,7 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
   }, [reload]);
 
   const value = useMemo<Store>(() => {
-    // Elo wird über die komplette Historie berechnet (auch mit entfernten Spielern) …
+    // Die LK wird über die komplette Historie berechnet (auch mit entfernten Spielern) …
     const games = data.games.filter((g) => !g.deleted_at); // gelöschte Spiele zählen nicht
     const full = computeLeague(data.players, games);
     const activePlayers = data.players.filter((p) => !p.archived_at);

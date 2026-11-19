@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useLeague } from '../lib/store';
 import { resultQuip } from '../lib/insights';
-import { teamOf, winnerOf } from '../lib/rating';
+import { formatLk, teamOf, winnerOf } from '../lib/rating';
 import type { Game, Mode, Side } from '../lib/types';
 import { Avatar } from '../components/Avatar';
 import { PlayerPicker } from '../components/PlayerPicker';
@@ -132,7 +132,7 @@ export function NewGame() {
           )}
           <Avatar player={p} size={56} ring={side} />
           <span className="w-full truncate text-center text-sm font-extrabold">{p?.name ?? 'Pick player'}</span>
-          {s && <span className="text-[10px] text-white/60">Elo {Math.round(s.elo)}</span>}
+          {s && <span className="text-[10px] text-white/60">LK {formatLk(s.lk)}</span>}
         </button>
         {p && (
           <button
@@ -173,12 +173,12 @@ export function NewGame() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/70" />
         <div className="relative grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <div className="rounded-lg bg-red-team py-1 text-center font-score text-xl tracking-widest">TEAM RED</div>
+            <div className="rounded-lg border-2 border-white/60 bg-team-black py-1 text-center font-score text-xl tracking-widest text-white">TEAM BLACK</div>
             {slotButton('red_1', 'red')}
             {draft.mode === '2v2' && slotButton('red_2', 'red')}
           </div>
           <div className="space-y-2">
-            <div className="rounded-lg bg-blue-team py-1 text-center font-score text-xl tracking-widest">TEAM BLUE</div>
+            <div className="rounded-lg bg-team-white py-1 text-center font-score text-xl tracking-widest text-black">TEAM WHITE</div>
             {slotButton('blue_1', 'blue')}
             {draft.mode === '2v2' && slotButton('blue_2', 'blue')}
           </div>
@@ -208,7 +208,7 @@ export function NewGame() {
 
       <PlayerPicker
         open={!!picking}
-        title={picking ? `${picking.startsWith('red') ? 'Red' : 'Blue'}${draft.mode === '2v2' ? ' – ' + slotLabel[picking] : ''}` : ''}
+        title={picking ? `${picking.startsWith('red') ? 'Black' : 'White'}${draft.mode === '2v2' ? ' – ' + slotLabel[picking] : ''}` : ''}
         taken={taken}
         onClose={() => setPicking(null)}
         onPick={(p) => {
@@ -226,7 +226,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
   const [err, setErr] = useState<string | null>(null);
   const w = winnerOf(game);
   const r = league.gameRatings.get(game.id);
-  const underdog = !!r && (w === 'red' ? r.redExpected < 0.4 : r.redExpected > 0.6);
+  const underdog = !!r && r.lkDiff >= 2; // Sieger war mind. 2 LK-Stufen schwächer
   const winners = teamOf(game, w);
   const losers = teamOf(game, w === 'red' ? 'blue' : 'red');
 
@@ -242,16 +242,15 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
 
   const row = (id: string) => {
     const p = playersById.get(id);
-    const d = r?.deltas[id] ?? 0;
+    const gain = r?.gains[id] ?? 0;
     const s = league.players.get(id);
     return (
       <Link to={`/players/${id}`} key={id} className="flex items-center gap-3 rounded-xl bg-black/20 p-2">
         <Avatar player={p} size={40} />
         <span className="flex-1 font-bold">{p?.name}</span>
-        <span className="text-sm text-white/70">{s ? Math.round(s.elo) : ''}</span>
-        <span className={`w-16 text-right font-score text-2xl ${d >= 0 ? 'text-lime-300' : 'text-red-300'}`}>
-          {d >= 0 ? '+' : ''}
-          {d.toFixed(1)}
+        <span className="text-sm text-white/70">{s ? `LK ${formatLk(s.lk)}` : ''}</span>
+        <span className={`w-20 text-right font-score text-2xl ${gain > 0 ? 'text-lime-300' : 'text-white/40'}`}>
+          {gain > 0 ? `▲ ${gain.toFixed(2)}` : '–'}
         </span>
       </Link>
     );
@@ -261,7 +260,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
     <div className="text-center">
       <div className="mb-2 text-6xl">{underdog ? '🐶' : '🏆'}</div>
       <h1 className="font-score text-5xl tracking-wider drop-shadow">
-        Team {w === 'red' ? 'Red' : 'Blue'} wins!
+        Team {w === 'red' ? 'Black' : 'White'} wins!
       </h1>
       <div className="scoreboard mx-auto my-3 inline-block rounded-xl px-6 text-6xl">
         {game.score_red} : {game.score_blue}
@@ -269,7 +268,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
       <p className="mx-auto mb-4 max-w-sm text-lg font-semibold">{resultQuip(game, underdog)}</p>
 
       <div className="pitch-card mb-4 space-y-2 text-left">
-        <div className="text-xs font-bold uppercase tracking-widest text-white/70">Elo changes</div>
+        <div className="text-xs font-bold uppercase tracking-widest text-white/70">LK changes (only winners move, as in tennis)</div>
         {winners.map(row)}
         <div className="rod my-2" />
         {losers.map(row)}

@@ -1,21 +1,20 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLeague } from '../lib/store';
-import { sortRanking, sortTable } from '../lib/rating';
+import { formatLk, sortRanking, sortTable } from '../lib/rating';
 import { Avatar } from '../components/Avatar';
 import { Diff, FormDots } from '../components/Form';
 
 export function Table() {
   const { league, playersById, labsById } = useLeague();
-  const [mode, setMode] = useState<'table' | 'elo'>('table');
+  const [mode, setMode] = useState<'table' | 'lk'>('table');
   const all = [...league.players.values()];
   const rows = mode === 'table' ? sortTable(all) : sortRanking(all);
-  const pct = (x: number) => `${Math.round(x * 100)}%`;
   return (
     <div>
-      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">{mode === 'table' ? 'League table' : 'Elo ranking'}</h1>
+      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">{mode === 'table' ? 'League table' : 'LK ranking'}</h1>
       <div className="wood mb-4 grid grid-cols-2 gap-1 rounded-2xl p-1">
-        {([['table', 'Table (points)'], ['elo', 'Ranking (Elo)']] as const).map(([m, l]) => (
+        {([['table', 'Table (points)'], ['lk', 'Ranking (LK)']] as const).map(([m, l]) => (
           <button key={m} onClick={() => setMode(m)} className={`rounded-xl py-2 font-bold ${mode === m ? 'bg-white text-black' : 'text-white/90'}`}>{l}</button>
         ))}
       </div>
@@ -28,8 +27,7 @@ export function Table() {
               <th className="p-2" title="Played">P</th><th className="p-2" title="Wins">W</th><th className="p-2" title="Losses">L</th>
               <th className="p-2">Goals</th><th className="p-2" title="Goal difference">GD</th>
               <th className="p-2" title="Points">Pts</th>
-              <th className="p-2">Elo</th>
-              {mode === 'elo' && <th className="p-2">Win %</th>}
+              <th className="p-2" title="LK 1.5 = strongest, 25 = weakest">LK</th>
               <th className="p-2">Form</th>
             </tr>
           </thead>
@@ -38,7 +36,7 @@ export function Table() {
               const p = playersById.get(s.playerId);
               if (!p) return null;
               return (
-                <tr key={s.playerId} className={`border-t border-white/10 text-center ${s.provisional && mode === 'elo' ? 'opacity-60' : ''}`}>
+                <tr key={s.playerId} className={`border-t border-white/10 text-center ${s.provisional && mode === 'lk' ? 'opacity-60' : ''}`}>
                   <td className="p-2 text-left font-score text-xl">{i + 1}</td>
                   <td className="p-2 text-left">
                     <Link to={`/players/${p.id}`} className="flex items-center gap-2">
@@ -53,19 +51,17 @@ export function Table() {
                   <td className="p-2">{s.goalsFor}:{s.goalsAgainst}</td>
                   <td className="p-2"><Diff value={s.diff} /></td>
                   <td className="p-2 font-score text-xl text-yellow-300">{s.points}</td>
-                  <td className="p-2 font-bold">{Math.round(s.elo)}</td>
-                  {mode === 'elo' && <td className="p-2">{pct(s.bayes)}</td>}
+                  <td className="p-2 font-bold">{formatLk(s.lk)}</td>
                   <td className="p-2"><FormDots form={s.form} /></td>
                 </tr>
               );
             })}
-            {!rows.length && <tr><td colSpan={11} className="p-6 text-center text-white/70">No players yet.</td></tr>}
+            {!rows.length && <tr><td colSpan={10} className="p-6 text-center text-white/70">No players yet.</td></tr>}
           </tbody>
         </table>
       </div>
       <p className="mt-3 text-xs text-white/70">
-        Table: win = 1 point, then goal difference. Elo accounts for opponent strength and margin of victory; under 5 matches you are a rookie.
-        Win % is smoothed (1 win from 1 match ≠ 100 %). Tap a player to see their profile.
+        Table: win = 1 point, then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every week all LKs drop by 0.025. Tap a player to see their profile.
       </p>
     </div>
   );
