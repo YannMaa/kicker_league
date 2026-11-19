@@ -37,7 +37,7 @@ export function MatchHistory() {
         <div className="space-y-2">
           {list.slice(0, limit).map((g) => (
             <div key={g.id}>
-              <GameRow game={g} />
+              <GameRow game={g} to={`/matches/${g.id}`} />
               {confirmId === g.id ? (
                 <div className="mt-1 rounded-xl bg-black/30 p-2 text-center text-sm">
                   <p className="mb-2">Delete this match? The table and LK ratings are recalculated.</p>
