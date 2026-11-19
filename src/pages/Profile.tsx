@@ -63,10 +63,18 @@ export function Profile() {
       )}
       <div className="mb-4 flex items-center gap-4">
         <Avatar player={p} size={88} />
-        <div>
-          <h1 className="font-score text-5xl leading-none tracking-wider">{p.name}</h1>
+        <div className="min-w-0 flex-1">
+          <h1 className="break-words font-score text-5xl leading-none tracking-wider">{p.name}</h1>
           <div className="text-white/80">{(p.lab_id && labsById.get(p.lab_id)?.name) || 'No lab'}</div>
         </div>
+        <Link
+          to={`/players/${p.id}/edit`}
+          aria-label="Edit profile"
+          title="Edit profile"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-xl shadow-[0_3px_0_#94a3b8] transition active:scale-95"
+        >
+          ✏️
+        </Link>
       </div>
       <div className="mb-4 grid grid-cols-4 gap-2">
         {stat('LK', formatLk(s.lk))}{stat('Wins', s.wins)}{stat('Matches', s.games)}{stat('Goal diff', s.diff > 0 ? `+${s.diff}` : s.diff)}

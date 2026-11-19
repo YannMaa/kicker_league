@@ -12,11 +12,14 @@ export interface LeagueData {
   games: Game[];
 }
 
+export type PlayerPatch = Partial<Pick<Player, 'name' | 'lab_id' | 'avatar_style' | 'avatar_seed' | 'avatar_options'>>;
+
 export interface Api {
   demo: boolean;
   load(): Promise<LeagueData>;
   addLab(name: string): Promise<Lab>;
-  addPlayer(p: Pick<Player, 'name' | 'lab_id' | 'avatar_style' | 'avatar_seed'>): Promise<Player>;
+  addPlayer(p: Pick<Player, 'name' | 'lab_id' | 'avatar_style' | 'avatar_seed' | 'avatar_options'>): Promise<Player>;
+  updatePlayer(id: string, patch: PlayerPatch): Promise<Player>;
   archivePlayer(id: string): Promise<void>;
   addGame(g: NewGame): Promise<Game>;
   deleteGame(id: string): Promise<void>;
@@ -65,6 +68,13 @@ function supabaseApi(sb: SupabaseClient): Api {
       const { data, error } = await sb.from('players').insert({ ...p, name: p.name.trim() }).select().single();
       if (error) throw friendlyError(error);
       return data as Player;
+    },
+    async updatePlayer(id, patch) {
+      const body = { ...patch, ...(patch.name !== undefined ? { name: patch.name.trim() } : {}) };
+      const { data, error } = await sb.from('players').update(body).eq('id', id).select();
+      if (error) throw friendlyError(error);
+      if (!data?.length) throw new Error('Could not save the changes (was the player removed?).');
+      return data[0] as Player;
     },
     async archivePlayer(id) {
       const { data, error } = await sb
@@ -143,6 +153,16 @@ function demoApi(): Api {
       state.players.push(player);
       save();
       return player;
+    },
+    async updatePlayer(pid, patch) {
+      const pl = state.players.find((x) => x.id === pid && !x.archived_at);
+      if (!pl) throw new Error('Player not found.');
+      const nm = patch.name?.trim();
+      if (nm !== undefined && state.players.some((x) => x.id !== pid && !x.archived_at && x.name.toLowerCase() === nm.toLowerCase()))
+        throw new Error('That name is already taken – please pick another one.');
+      Object.assign(pl, patch, nm !== undefined ? { name: nm } : {});
+      save();
+      return { ...pl };
     },
     async archivePlayer(pid) {
       const pl = state.players.find((x) => x.id === pid);

@@ -4,12 +4,22 @@ export interface Lab {
   created_at: string;
 }
 
+export type Mood = 'happy' | 'funny' | 'relaxed' | 'cool' | 'angry' | 'surprised' | 'sad';
+
+/** Auswahl bei der Registrierung (nur Adventurer/Comic). null = alter Avatar, nur Stil + Seed. */
+export interface AvatarOptions {
+  skinColor: string;
+  hairColor: string;
+  mood: Mood;
+}
+
 export interface Player {
   id: string;
   name: string;
   lab_id: string | null;
   avatar_style: string;
   avatar_seed: string;
+  avatar_options: AvatarOptions | null;
   created_at: string;
   /** gesetzt = Spieler wurde entfernt (Historie bleibt) */
   archived_at: string | null;

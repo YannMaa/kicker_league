@@ -9,6 +9,7 @@ import { Profile } from './pages/Profile';
 import { Insights } from './pages/Insights';
 import { QrPrint } from './pages/QrPrint';
 import { MatchDetail } from './pages/MatchDetail';
+import { EditPlayer } from './pages/EditPlayer';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="game" element={<NewGame />} />
             <Route path="players/new" element={<Register />} />
             <Route path="players/:id" element={<Profile />} />
+            <Route path="players/:id/edit" element={<EditPlayer />} />
             <Route path="matches/:id" element={<MatchDetail />} />
             <Route path="table" element={<Table />} />
             {/* alte deutsche Adressen (z.B. bereits gescannte QR-Codes) */}

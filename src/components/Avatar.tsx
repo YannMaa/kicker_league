@@ -14,7 +14,7 @@ export function Avatar({ player, size = 40, ring }: { player?: Player | null; si
     );
   return (
     <img
-      src={avatarUri(player.avatar_style, player.avatar_seed)}
+      src={avatarUri(player.avatar_style, player.avatar_seed, player.avatar_options)}
       alt={player.name}
       width={size}
       height={size}

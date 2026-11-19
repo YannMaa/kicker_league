@@ -32,6 +32,7 @@ export function demoData(): LeagueData {
     lab_id: labs[lab].id,
     avatar_style: style,
     avatar_seed: name.toLowerCase(),
+    avatar_options: null,
     created_at: iso(start),
     archived_at: null,
   }));

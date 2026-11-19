@@ -21,6 +21,11 @@ create table if not exists public.players (
 );
 -- Soft-Delete: entfernte Spieler bleiben samt Spielhistorie erhalten (Wiederherstellen: archived_at auf NULL setzen)
 alter table public.players add column if not exists archived_at timestamptz;
+-- Avatar-Auswahl bei der Registrierung (Haut-/Haarfarbe, Stimmung). Optional: alte Spieler behalten ihren Avatar (NULL).
+alter table public.players add column if not exists avatar_options jsonb;
+alter table public.players drop constraint if exists players_avatar_options_ok;
+alter table public.players add constraint players_avatar_options_ok
+  check (avatar_options is null or (jsonb_typeof(avatar_options) = 'object' and length(avatar_options::text) <= 300));
 -- Namen eindeutig unter aktiven Spielern (Groß-/Kleinschreibung egal)
 drop index if exists public.players_name_unique;
 create unique index if not exists players_name_active_unique on public.players (lower(trim(name))) where archived_at is null;
@@ -65,6 +70,7 @@ drop policy if exists "add games"    on public.games;
 drop policy if exists "undo recent game" on public.games;
 drop policy if exists "archive player" on public.players;
 drop policy if exists "archive game" on public.games;
+drop policy if exists "edit player" on public.players;
 
 -- Jeder darf lesen
 create policy "read labs"    on public.labs    for select to anon, authenticated using (true);
@@ -84,6 +90,10 @@ create policy "archive game" on public.games for update to anon, authenticated
 create policy "archive player" on public.players for update to anon, authenticated
   using (archived_at is null) with check (archived_at is not null);
 
+-- Profil bearbeiten: nur Name, Lab und Avatar (Spalten-Rechte unten), nur bei aktiven Spielern.
+create policy "edit player" on public.players for update to anon, authenticated
+  using (archived_at is null) with check (archived_at is null);
+
 -- Sonst keine UPDATE-Rechte → alles andere ändern nur über das Dashboard (service_role).
 
 -- ---------- Spalten-Rechte ----------
@@ -91,9 +101,10 @@ create policy "archive player" on public.players for update to anon, authenticat
 revoke insert, update, delete on public.labs, public.players, public.games from anon, authenticated;
 grant select on public.labs, public.players, public.games to anon, authenticated;
 grant insert (name)                                   on public.labs    to anon, authenticated;
-grant insert (name, lab_id, avatar_style, avatar_seed) on public.players to anon, authenticated;
+grant insert (name, lab_id, avatar_style, avatar_seed, avatar_options) on public.players to anon, authenticated;
 grant insert (mode, red_1, red_2, blue_1, blue_2, score_red, score_blue) on public.games to anon, authenticated;
 grant update (archived_at) on public.players to anon, authenticated;
+grant update (name, lab_id, avatar_style, avatar_seed, avatar_options) on public.players to anon, authenticated;
 grant update (deleted_at)  on public.games   to anon, authenticated;
 
 -- ---------- Admin-Rechte (Backup/Restore, Dashboard-Korrekturen) ----------

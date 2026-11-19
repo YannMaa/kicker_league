@@ -32,6 +32,9 @@ npm test         # Tests für LK/Tabelle/Insights
 ### 4. QR-Code
 `https://<deine-url>/qr` öffnen → **Drucken**. Der Code führt direkt auf `/game`.
 
+## Avatare
+Bei der Registrierung gibt es zwei Stile (Adventurer, Comic). Man wählt Hautfarbe, Haarfarbe und Stimmung (Happy, Funny, Relaxed, Cool, Angry, Surprised, Sad). Gespeichert wird nur die Auswahl (`players.avatar_options`), das Bild entsteht daraus im Browser. Ältere Spieler ohne Auswahl behalten ihren Avatar. Über den ✏️-Button im Profil lassen sich Name, Lab und Avatar später ändern (sonst nichts). Zuordnung Stimmung → Gesichtsteile: `src/lib/avatar.ts`.
+
 ## Wiederherstellen
 Alle Statistiken werden aus den Rohdaten (labs/players/games) berechnet, nur die sind im Backup.
 1. Neues Supabase-Projekt, `schema.sql` ausführen.

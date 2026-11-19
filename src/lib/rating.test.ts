@@ -19,6 +19,7 @@ const P = (id: string, lab: string | null = null): Player => ({
   lab_id: lab,
   avatar_style: 'adventurer',
   avatar_seed: id,
+  avatar_options: null,
   created_at: '2026-01-01T00:00:00Z',
   archived_at: null,
 });
