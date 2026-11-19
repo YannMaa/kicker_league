@@ -1,23 +1,16 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLeague } from '../lib/store';
-import { formatLk, sortRanking, sortTable } from '../lib/rating';
+import { formatLk, sortTable } from '../lib/rating';
 import { Avatar } from '../components/Avatar';
 import { Diff, FormDots } from '../components/Form';
 
 export function Table() {
   const { league, playersById, labsById } = useLeague();
-  const [mode, setMode] = useState<'table' | 'lk'>('table');
   const all = [...league.players.values()];
-  const rows = mode === 'table' ? sortTable(all) : sortRanking(all);
+  const rows = sortTable(all);
   return (
     <div>
-      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">{mode === 'table' ? 'League table' : 'LK ranking'}</h1>
-      <div className="wood mb-4 grid grid-cols-2 gap-1 rounded-2xl p-1">
-        {([['table', 'Table (points)'], ['lk', 'Ranking (LK)']] as const).map(([m, l]) => (
-          <button key={m} onClick={() => setMode(m)} className={`rounded-xl py-2 font-bold ${mode === m ? 'bg-white text-black' : 'text-white/90'}`}>{l}</button>
-        ))}
-      </div>
+      <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">Table</h1>
       <div className="overflow-x-auto rounded-2xl border-2 border-white/70 bg-black/20">
         <table className="w-full min-w-[30rem] text-sm">
           <thead className="bg-black/40 text-xs uppercase tracking-wider text-white/80">
@@ -35,7 +28,7 @@ export function Table() {
               const p = playersById.get(s.playerId);
               if (!p) return null;
               return (
-                <tr key={s.playerId} className={`border-t border-white/10 text-center ${s.provisional && mode === 'lk' ? 'opacity-60' : ''}`}>
+                <tr key={s.playerId} className={`border-t border-white/10 text-center`}>
                   <td className="p-2 text-left font-score text-xl">{i + 1}</td>
                   <td className="p-2 text-left">
                     <Link to={`/players/${p.id}`} className="flex items-center gap-2">
