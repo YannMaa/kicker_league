@@ -1,1 +1,74 @@
-[]
+[
+  {
+    "id": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "name": "Yannis",
+    "lab_id": "5a031ed2-f65c-430a-8ae0-59e681a409ad",
+    "avatar_style": "adventurer",
+    "avatar_seed": "rmeznu44",
+    "created_at": "2026-11-18T16:28:41.964949+00:00",
+    "archived_at": null
+  },
+  {
+    "id": "dd3ac0a9-65e6-4587-92fc-e66c64c29d73",
+    "name": "Paula",
+    "lab_id": "b2bd1c35-aaf2-4973-8cf2-cef3d368603f",
+    "avatar_style": "adventurer",
+    "avatar_seed": "l3yh5iti",
+    "created_at": "2026-11-18T16:30:04.597648+00:00",
+    "archived_at": "2026-11-18T16:44:08.811+00:00"
+  },
+  {
+    "id": "0c464d11-8b03-4e8f-ab8a-ce266fa1728d",
+    "name": "Leonie",
+    "lab_id": "2ed5cc60-eaa2-4e0c-bffb-b76b35f7ef26",
+    "avatar_style": "adventurer",
+    "avatar_seed": "4d06twwl",
+    "created_at": "2026-11-18T16:30:44.754906+00:00",
+    "archived_at": "2026-11-18T16:44:29.553+00:00"
+  },
+  {
+    "id": "48f841fa-d085-4ea1-8737-309ff4ec73c4",
+    "name": "Tim",
+    "lab_id": "cde0a800-021a-4215-9068-707aa8f3e191",
+    "avatar_style": "adventurer",
+    "avatar_seed": "9mlahv6q",
+    "created_at": "2026-11-18T16:31:18.416808+00:00",
+    "archived_at": "2026-11-18T16:44:19.534+00:00"
+  },
+  {
+    "id": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "name": "Paula",
+    "lab_id": "b2bd1c35-aaf2-4973-8cf2-cef3d368603f",
+    "avatar_style": "adventurer",
+    "avatar_seed": "px1rxz5q",
+    "created_at": "2026-11-18T16:52:41.937072+00:00",
+    "archived_at": null
+  },
+  {
+    "id": "9dc52917-5dba-4c88-8d06-f30365be71b6",
+    "name": "Leo",
+    "lab_id": null,
+    "avatar_style": "funEmoji",
+    "avatar_seed": "2vj51hhb",
+    "created_at": "2026-11-19T09:24:59.303998+00:00",
+    "archived_at": null
+  },
+  {
+    "id": "ba883124-464e-4026-aae2-6e95390c2602",
+    "name": "Leonie",
+    "lab_id": "2ed5cc60-eaa2-4e0c-bffb-b76b35f7ef26",
+    "avatar_style": "lorelei",
+    "avatar_seed": "mywuj0me",
+    "created_at": "2026-11-19T11:45:36.692554+00:00",
+    "archived_at": null
+  },
+  {
+    "id": "94edd336-2233-4cbc-b45a-c66e94669366",
+    "name": "yannicking",
+    "lab_id": "b2bd1c35-aaf2-4973-8cf2-cef3d368603f",
+    "avatar_style": "avataaars",
+    "avatar_seed": "1hcdryyz",
+    "created_at": "2026-11-19T11:45:43.69433+00:00",
+    "archived_at": null
+  }
+]

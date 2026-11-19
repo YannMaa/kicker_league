@@ -1,1 +1,122 @@
-[]
+[
+  {
+    "id": "2f51c024-487f-49a2-89f8-b5c27359ddf4",
+    "created_at": "2026-11-18T16:31:45.517417+00:00",
+    "mode": "2v2",
+    "red_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "red_2": "0c464d11-8b03-4e8f-ab8a-ce266fa1728d",
+    "blue_1": "dd3ac0a9-65e6-4587-92fc-e66c64c29d73",
+    "blue_2": "48f841fa-d085-4ea1-8737-309ff4ec73c4",
+    "score_red": 10,
+    "score_blue": 9,
+    "deleted_at": "2026-11-18T16:45:10.097+00:00"
+  },
+  {
+    "id": "5a537411-d213-427c-af3e-42476466812b",
+    "created_at": "2026-11-18T16:53:01.992809+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 5,
+    "score_blue": 0,
+    "deleted_at": "2026-11-18T16:53:20.708+00:00"
+  },
+  {
+    "id": "fbfd1409-a20d-443b-bd18-db71dd126fdd",
+    "created_at": "2026-11-18T17:08:48.36384+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 10,
+    "score_blue": 9,
+    "deleted_at": "2026-11-18T17:11:54.949+00:00"
+  },
+  {
+    "id": "bb5f2c98-7c82-4e9f-ae10-6426c38014f1",
+    "created_at": "2026-11-18T17:08:56.414711+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 10,
+    "score_blue": 2,
+    "deleted_at": "2026-11-18T17:11:53.599+00:00"
+  },
+  {
+    "id": "3c205efc-c9f3-4df6-8256-cbade861d61c",
+    "created_at": "2026-11-18T17:09:31.26893+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 8,
+    "score_blue": 10,
+    "deleted_at": "2026-11-18T17:11:52.325+00:00"
+  },
+  {
+    "id": "3ed36c8b-65d9-4cd1-a93f-7f749cf48898",
+    "created_at": "2026-11-18T17:09:37.142616+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 8,
+    "score_blue": 10,
+    "deleted_at": "2026-11-18T17:11:50.816+00:00"
+  },
+  {
+    "id": "413fa6d7-a91c-47d6-870a-4eb326887b39",
+    "created_at": "2026-11-18T17:09:41.880537+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 10,
+    "score_blue": 9,
+    "deleted_at": "2026-11-18T17:11:29.671+00:00"
+  },
+  {
+    "id": "97caa277-d050-440f-a3fe-ad142a89f31d",
+    "created_at": "2026-11-18T17:09:47.645562+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 1,
+    "score_blue": 10,
+    "deleted_at": "2026-11-18T17:11:27.455+00:00"
+  },
+  {
+    "id": "f3b50a6d-f97c-47b3-bb08-ba306e4fdeac",
+    "created_at": "2026-11-18T17:09:57.388099+00:00",
+    "mode": "1v1",
+    "red_1": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "red_2": null,
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": null,
+    "score_red": 1,
+    "score_blue": 10,
+    "deleted_at": "2026-11-18T17:11:25.566+00:00"
+  },
+  {
+    "id": "0673df37-1e2c-4d66-8674-78acd0c2aba9",
+    "created_at": "2026-11-19T11:46:36.268193+00:00",
+    "mode": "2v2",
+    "red_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "red_2": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "blue_1": "ba883124-464e-4026-aae2-6e95390c2602",
+    "blue_2": "94edd336-2233-4cbc-b45a-c66e94669366",
+    "score_red": 10,
+    "score_blue": 6,
+    "deleted_at": null
+  }
+]
