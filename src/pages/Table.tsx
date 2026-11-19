@@ -19,15 +19,14 @@ export function Table() {
         ))}
       </div>
       <div className="overflow-x-auto rounded-2xl border-2 border-white/70 bg-black/20">
-        <table className="w-full min-w-[34rem] text-sm">
+        <table className="w-full min-w-[30rem] text-sm">
           <thead className="bg-black/40 text-xs uppercase tracking-wider text-white/80">
             <tr>
               <th className="p-2 text-left">#</th>
               <th className="p-2 text-left">Player</th>
-              <th className="p-2" title="Played">P</th><th className="p-2" title="Wins">W</th><th className="p-2" title="Losses">L</th>
-              <th className="p-2">Goals</th><th className="p-2" title="Goal difference">GD</th>
-              <th className="p-2" title="Points">Pts</th>
               <th className="p-2" title="LK 1.5 = strongest, 25 = weakest">LK</th>
+              <th className="p-2">Wins</th><th className="p-2">Losses</th>
+              <th className="p-2">Goals</th><th className="p-2" title="Goal difference">Goal Diff</th>
               <th className="p-2">Form</th>
             </tr>
           </thead>
@@ -47,21 +46,20 @@ export function Table() {
                       </span>
                     </Link>
                   </td>
-                  <td className="p-2">{s.games}</td><td className="p-2">{s.wins}</td><td className="p-2">{s.losses}</td>
+                  <td className="p-2 font-score text-xl text-yellow-300">{formatLk(s.lk)}</td>
+                  <td className="p-2">{s.wins}</td><td className="p-2">{s.losses}</td>
                   <td className="p-2">{s.goalsFor}:{s.goalsAgainst}</td>
                   <td className="p-2"><Diff value={s.diff} /></td>
-                  <td className="p-2 font-score text-xl text-yellow-300">{s.points}</td>
-                  <td className="p-2 font-bold">{formatLk(s.lk)}</td>
                   <td className="p-2"><FormDots form={s.form} /></td>
                 </tr>
               );
             })}
-            {!rows.length && <tr><td colSpan={10} className="p-6 text-center text-white/70">No players yet.</td></tr>}
+            {!rows.length && <tr><td colSpan={8} className="p-6 text-center text-white/70">No players yet.</td></tr>}
           </tbody>
         </table>
       </div>
       <p className="mt-3 text-xs text-white/70">
-        Table: win = 1 point, then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every week all LKs drop by 0.025. Tap a player to see their profile.
+        Table: win = 1 point (so ranked by Wins), then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every week all LKs drop by 0.025. Tap a player to see their profile.
       </p>
     </div>
   );

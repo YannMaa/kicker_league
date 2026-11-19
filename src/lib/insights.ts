@@ -1,19 +1,16 @@
 /**
- * Insights & Trainingsempfehlungen – reine Funktionen über Rohdaten + LeagueStats.
+ * Insights – reine Funktionen über Rohdaten + LeagueStats.
  */
 import type { Game, Lab, Player } from './types';
 import {
   type LeagueStats,
   type PlayerStats,
-  PROVISIONAL_GAMES,
   bayesRate,
   sideOf,
   sortGamesChrono,
   teamOf,
   winnerOf,
 } from './rating';
-
-const DAY = 24 * 60 * 60 * 1000;
 
 // ---------------------------------------------------------------- Duos
 export interface DuoStat {
@@ -241,118 +238,15 @@ export function records(games: Game[], league: LeagueStats): Records {
   };
 }
 
-// ---------------------------------------------------------------- Trainingsempfehlungen
-export interface Recommendation {
-  key: string;
-  emoji: string;
-  title: string;
-  playerId: string;
-  text: string;
-  tone: 'bad' | 'good';
-}
-
+// ---------------------------------------------------------------- Text helpers
 function hash(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
   return Math.abs(h);
 }
-/** Deterministisch pro Spieler wählen, damit der Text nicht bei jedem Reload wechselt. */
+/** Deterministisch wählen (gleicher Seed = gleicher Text), damit er nicht bei jedem Reload wechselt. */
 function pickText(texts: string[], seed: string): string {
   return texts[hash(seed) % texts.length];
-}
-
-const TXT = {
-  keeper: [
-    'The goal is wide open, like the cafeteria at noon. Goalkeeper training strongly recommended!',
-    'Goals conceded per game: record high. Maybe try actually holding the back rod?',
-    'The back door is wide open. Please lock it before the next match.',
-  ],
-  striker: [
-    'The ball just will not go in. Striker coaching: 100 shots every lunch break.',
-    'Scores less often than the printer on the 3rd floor. Drink some aiming water!',
-    'Goal threat: low. Pro tip: the ball has to go into the OTHER goal.',
-  ],
-  camp: [
-    'Training camp at the foosball table recommended. Sleeping bag provided.',
-    'Your LK needs some love. Maybe play with the top 3 and learn from them?',
-    'A place in the sun? More like a place in the basement. Time for extra shifts!',
-  ],
-  crisis: [
-    'Losing streak! Crisis meeting with the board has been called.',
-    'The coach\u2019s chair is wobbling. A win is needed, and fast!',
-    'Bad luck streak detected. Recommendation: bring a lucky charm and switch sides.',
-  ],
-  injury: [
-    'Long time no see. Injured, or secretly training?',
-    'Has not been seen at the table for weeks. We miss you!',
-    'Missing person: last seen at the foosball table. Please report to the league office.',
-  ],
-  bench: [
-    'Registered, but barely played. Off the bench and into the game!',
-    'Benchwarmer alert: the rods are waiting for you!',
-    'Still a rookie. A few more matches and you are officially in the table!',
-  ],
-  form: [
-    'Form curve is pointing steeply upwards. Currently unstoppable!',
-    'On fire! Gained the most LK in the last week.',
-    'Run of a lifetime! Please do not disturb, the flow is sacred.',
-  ],
-};
-
-export function trainingRecommendations(league: LeagueStats, now: Date = new Date()): Recommendation[] {
-  const all = [...league.players.values()];
-  const active = all.filter((s) => s.games >= 3);
-  const recs: Recommendation[] = [];
-  const add = (key: string, emoji: string, title: string, s: PlayerStats, pool: string[], tone: 'bad' | 'good' = 'bad') =>
-    recs.push({ key: `${key}-${s.playerId}`, emoji, title, playerId: s.playerId, text: pickText(pool, s.playerId + key), tone });
-
-  // 🔥 Formkurve: größte LK-Verbesserung der letzten 7 Tage
-  const since = now.getTime() - 7 * DAY;
-  let bestForm: { s: PlayerStats; gain: number } | null = null;
-  for (const s of all) {
-    const hist = league.lkHistory.get(s.playerId) ?? [];
-    const before = [...hist].reverse().find((p) => new Date(p.t).getTime() < since)?.lk ?? hist[0]?.lk;
-    const recent = hist.filter((p) => new Date(p.t).getTime() >= since);
-    if (!recent.length || before === undefined) continue;
-    const gain = before - recent[recent.length - 1].lk; // kleinere LK = Verbesserung
-    if (gain > 0 && (!bestForm || gain > bestForm.gain)) bestForm = { s, gain };
-  }
-  if (bestForm) add('form', '🔥', 'Hot streak', bestForm.s, TXT.form, 'good');
-
-  // 🧤 Torwart-Training
-  const keeper = [...active].sort((a, b) => b.goalsAgainst / b.games - a.goalsAgainst / a.games)[0];
-  if (keeper) add('keeper', '🧤', 'Goalkeeper training', keeper, TXT.keeper);
-
-  // 🎯 Sturm-Coaching
-  const striker = [...active].sort((a, b) => a.goalsFor / a.games - b.goalsFor / b.games)[0];
-  if (striker && striker.playerId !== keeper?.playerId) add('striker', '🎯', 'Striker coaching', striker, TXT.striker);
-
-  // 🏕️ Trainingslager: schlechteste LK bei ≥ PROVISIONAL_GAMES Spielen
-  const established = all.filter((s) => s.games >= PROVISIONAL_GAMES);
-  if (established.length >= 3) {
-    const camp = [...established].sort((a, b) => b.lk - a.lk)[0];
-    add('camp', '🏕️', 'Training camp recommended', camp, TXT.camp);
-  }
-
-  // 🚨 Krisensitzung: Niederlagenserie ≥ 3
-  for (const s of all)
-    if (s.currentStreak.type === 'L' && s.currentStreak.length >= 3)
-      add('crisis', '🚨', `Crisis meeting (${s.currentStreak.length} losses in a row)`, s, TXT.crisis);
-
-  // 🛋️ Verletzungspause: > 14 Tage nicht gespielt
-  all
-    .filter((s) => s.lastPlayed && now.getTime() - new Date(s.lastPlayed).getTime() > 14 * DAY)
-    .sort((a, b) => a.lastPlayed!.localeCompare(b.lastPlayed!))
-    .slice(0, 3)
-    .forEach((s) => add('injury', '🛋️', 'Injured?', s, TXT.injury));
-
-  // 🪑 Bankdrücker: < 3 Spiele
-  all
-    .filter((s) => s.games < 3)
-    .slice(0, 3)
-    .forEach((s) => add('bench', '🪑', 'Benchwarmer', s, TXT.bench));
-
-  return recs;
 }
 
 // ---------------------------------------------------------------- Quips after a match
@@ -391,7 +285,7 @@ export function resultQuip(game: Game, underdogWin: boolean): string {
     return pickText(
       [
         'Clear-cut! That was a masterclass. 📚',
-        'A decisive win. The losers should check out the training plan.',
+        'A decisive win. The losers might want to watch some tutorials.',
         'Pure dominance! The rods are still glowing.',
       ],
       seed,

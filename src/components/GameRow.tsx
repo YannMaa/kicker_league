@@ -44,7 +44,7 @@ export function GameRow({ game, highlight }: { game: Game; highlight?: string })
         <span className="text-[10px] text-white/60">{formatDate(game.created_at)}</span>
         {gain !== undefined && (
           <span className={`text-[10px] font-bold ${gain > 0 ? 'text-lime-300' : 'text-white/50'}`}>
-            {gain > 0 ? `▲ ${gain.toFixed(2)} LK` : 'LK unchanged'}
+            +{gain.toFixed(2)} LK
           </span>
         )}
       </div>

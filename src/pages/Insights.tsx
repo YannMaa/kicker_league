@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { formatLk } from '../lib/rating';
 import { useLeague } from '../lib/store';
-import { bestDuo, biggestRivalry, duoStats, labStats, records, trainingRecommendations, worstDuo } from '../lib/insights';
+import { bestDuo, biggestRivalry, duoStats, labStats, records, worstDuo } from '../lib/insights';
 import { Avatar } from '../components/Avatar';
 import { GameRow } from '../components/GameRow';
 import { Section } from '../components/Section';
@@ -16,7 +16,6 @@ export function Insights() {
   const rival = biggestRivalry(games, (a, b) => isActive(a) && isActive(b));
   const labList = labStats(labs, players, league);
   const rec = records(games, league);
-  const recs = trainingRecommendations(league);
   const P = (id: string) => playersById.get(id);
   const pn = (id: string) => P(id)?.name ?? '?';
 
@@ -45,22 +44,6 @@ export function Insights() {
     <div>
       <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">Insights</h1>
 
-      <Section title="Training plan">
-        <div className="space-y-2">
-          {recs.map((r) => (
-            <Link key={r.key} to={`/players/${r.playerId}`} className={`flex items-start gap-3 rounded-2xl border-2 p-3 ${r.tone === 'good' ? 'border-lime-300/70 bg-lime-300/10' : 'border-white/50 bg-black/20'}`}>
-              <span className="text-3xl">{r.emoji}</span>
-              <Avatar player={P(r.playerId)} size={40} />
-              <div className="min-w-0">
-                <div className="font-extrabold">{pn(r.playerId)} <span className="font-semibold text-white/70">· {r.title}</span></div>
-                <div className="text-sm">{r.text}</div>
-              </div>
-            </Link>
-          ))}
-          {!recs.length && <p className="text-white/70">Everyone is in top form. No recommendations yet.</p>}
-        </div>
-      </Section>
-
       <Section title="Pairings">
         <div className="grid gap-3">
           <Card emoji="💪" title="Best duo (min. 3 matches)">
@@ -82,7 +65,7 @@ export function Insights() {
               <span className="font-score text-4xl">{i === 0 ? '👑' : i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="truncate font-extrabold">{l.name}</div>
-                <div className="text-sm text-white/70">Avg LK {formatLk(l.avgLk)} · {l.wins} wins · {l.activePlayers} players</div>
+                <div className="text-sm text-white/70">Avg LK {formatLk(l.avgLk)} · {l.wins} wins · {l.activePlayers} active players</div>
                 {l.bestPlayerId && <div className="text-sm">Best: <b>{pn(l.bestPlayerId)}</b></div>}
               </div>
               {l.bestPlayerId && <Avatar player={P(l.bestPlayerId)} size={40} />}

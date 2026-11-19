@@ -248,9 +248,11 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
       <Link to={`/players/${id}`} key={id} className="flex items-center gap-3 rounded-xl bg-black/20 p-2">
         <Avatar player={p} size={40} />
         <span className="flex-1 font-bold">{p?.name}</span>
-        <span className="text-sm text-white/70">{s ? `LK ${formatLk(s.lk)}` : ''}</span>
-        <span className={`w-20 text-right font-score text-2xl ${gain > 0 ? 'text-lime-300' : 'text-white/40'}`}>
-          {gain > 0 ? `▲ ${gain.toFixed(2)}` : '–'}
+        <span className="text-right text-xs text-white/70">
+          {s ? (gain > 0 ? `LK ${formatLk(s.lk + gain)} → ${formatLk(s.lk)}` : `LK ${formatLk(s.lk)}`) : ''}
+        </span>
+        <span className={`w-24 text-right font-score text-2xl ${gain > 0 ? 'text-lime-300' : 'text-white/50'}`}>
+          +{gain.toFixed(2)} LK
         </span>
       </Link>
     );
@@ -268,7 +270,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
       <p className="mx-auto mb-4 max-w-sm text-lg font-semibold">{resultQuip(game, underdog)}</p>
 
       <div className="pitch-card mb-4 space-y-2 text-left">
-        <div className="text-xs font-bold uppercase tracking-widest text-white/70">LK changes (only winners move, as in tennis)</div>
+        <div className="text-xs font-bold uppercase tracking-widest text-white/70">LK points earned (only winners gain, as in tennis)</div>
         {winners.map(row)}
         <div className="rod my-2" />
         {losers.map(row)}

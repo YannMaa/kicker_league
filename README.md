@@ -1,6 +1,6 @@
 # ⚽ AIBE Foosball League
 
-Tischkicker-Tabelle fürs Büro: QR-Code scannen → registrieren → Spiel eintragen → Tabelle, LK, Insights, Trainingsempfehlungen.
+Tischkicker-Tabelle fürs Büro: QR-Code scannen → registrieren → Spiel eintragen → Tabelle, LK, Insights.
 
 **Stack:** Vite + React + TypeScript + Tailwind · Supabase (Postgres) · Vercel (Hosting) · GitHub Actions (tägliches Backup)
 

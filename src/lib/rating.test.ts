@@ -8,7 +8,6 @@ import {
   labStats,
   playerRelations,
   records,
-  trainingRecommendations,
 } from './insights';
 
 // 2026-01-01 ist ein Donnerstag: Jan 1–4 liegen in derselben Woche (Mo 29.12.–So 04.01.), Jan 5 beginnt die nächste.
@@ -183,11 +182,5 @@ describe('Insights', () => {
     const rel = playerRelations('c', games);
     expect(rel.nemesis?.playerId).toBe('b'); // c hat 4× gegen b verloren
     expect(rel.bestPartner?.playerId).toBe('d'); // einziger Partner mit ≥ 2 Spielen
-  });
-
-  it('Trainingsempfehlungen werden erzeugt', () => {
-    const recs = trainingRecommendations(league, new Date('2026-01-05T00:00:00Z'));
-    expect(recs.some((r) => r.key.startsWith('keeper'))).toBe(true);
-    expect(recs.some((r) => r.key.startsWith('form'))).toBe(true);
   });
 });
