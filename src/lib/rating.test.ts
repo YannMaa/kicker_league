@@ -103,13 +103,15 @@ describe('LK-Berechnung', () => {
     expect(r.gains['a']).toBeCloseTo((pointsP(r.lkDiff) / hurdleH(r.redLk)) * 0.5);
   });
 
-  it('Wochen-Snapshot: Spiele derselben Woche werden gegen die LK vom Wochenanfang bewertet', () => {
+  it('Aktueller Stand pro Spiel: nach einem Sieg sinkt der Gewinn des nächsten Siegs', () => {
     const g1 = G(['a'], ['b'], 10, 3, 1);
     const g2 = G(['a'], ['b'], 10, 3, 2);
     const league = computeLeague(players, [g1, g2], SAME_WEEK);
     const a1 = league.gameRatings.get(g1.id)!.gains['a'];
     const a2 = league.gameRatings.get(g2.id)!.gains['a'];
-    expect(a2).toBeCloseTo(a1); // kein "Live"-Effekt innerhalb der Woche
+    expect(a1).toBeCloseTo(50 / 60);
+    expect(a2).toBeLessThan(a1); // a hat jetzt LK 23.1 (bessere LK, höhere Hürde, Gegner schwächer)
+    expect(league.gameRatings.get(g2.id)!.redLk).toBeCloseTo(23.1); // LK vor dem zweiten Spiel, abgeschnitten
   });
 
   it('Motivationsaufschlag: +0,025 pro Woche, höchstens LK 25', () => {

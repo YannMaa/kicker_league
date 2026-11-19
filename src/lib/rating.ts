@@ -50,7 +50,7 @@ export interface PlayerStats {
 
 export interface GameRating {
   gameId: string;
-  /** Team-LK (Durchschnitt der Wochen-LK der Partner, § 4) */
+  /** Team-LK vor dem Spiel (Durchschnitt der Partner, § 4) */
   redLk: number;
   blueLk: number;
   /** d = LK Sieger − LK Verlierer (positiv = der Schwächere hat gewonnen) */
@@ -143,17 +143,16 @@ function emptyStats(playerId: string): PlayerStats {
 }
 
 interface Meta {
-  /** LK vom Wochenanfang, auf eine Stelle abgeschnitten: Basis für P und H (§ 6.1) */
-  fixed: number;
   joinWeek: number;
 }
 
 /**
  * Berechnet Tabelle und LK für alle Spieler.
- * - Ergebnisse einer Woche werden gegen die LK vom Wochenanfang bewertet (§ 6.1).
+ * - Jedes Spiel wird gegen die LK bewertet, die die Spieler direkt vor dem Spiel hatten (angezeigte LK, eine Stelle abgeschnitten).
  * - Nur Sieger verbessern sich um P/H (Doppel: je 50 %), Verlierer bleiben unverändert (§ 3, § 4).
  * - Zum Wochenwechsel kommen 0,025 auf jede LK (§ 5), begrenzt auf 1,5 … 25,0 (§ 6.2).
- * Abweichung vom Tennis: Die LK wird sofort nach dem Spiel angezeigt (nicht erst nach der Auswertung am Mittwoch).
+ * Abweichung vom Tennis (§ 6.1): Dort werden alle Ergebnisse einer Woche gegen die LK vom Wochenanfang gerechnet
+ * und erst mittwochs ausgewiesen. Hier zählt der aktuelle Stand pro Spiel, die Anzeige ist sofort aktuell.
  */
 export function computeLeague(players: Player[], games: Game[], now: Date = new Date()): LeagueStats {
   const stats = new Map<string, PlayerStats>();
@@ -167,7 +166,7 @@ export function computeLeague(players: Player[], games: Game[], now: Date = new 
     if (!s) {
       s = emptyStats(id);
       stats.set(id, s);
-      meta.set(id, { fixed: truncLk(LK_START), joinWeek });
+      meta.set(id, { joinWeek });
       lkHistory.set(id, []);
     }
     return s;
@@ -182,7 +181,7 @@ export function computeLeague(players: Player[], games: Game[], now: Date = new 
     sorted.length ? weekOf(sorted[0].created_at) : Infinity,
   );
 
-  /** Wochenwechsel: Motivationsaufschlag für jede abgeschlossene Woche, dann LK für die neue Woche fixieren. */
+  /** Wochenwechsel: Motivationsaufschlag (§ 5) für jede abgeschlossene Woche. */
   const rollover = (to: number) => {
     if (to <= cur) return;
     for (const [id, m] of meta) {
@@ -190,7 +189,6 @@ export function computeLeague(players: Player[], games: Game[], now: Date = new 
       const weeks = Math.max(0, to - Math.max(cur, m.joinWeek));
       if (s.lk < LK_WORST) s.lk = Math.min(LK_WORST, s.lk + weeks * LK_WEEKLY_SURCHARGE);
       s.lk = Math.max(LK_BEST, s.lk);
-      m.fixed = truncLk(s.lk);
     }
     cur = to;
   };
@@ -204,7 +202,7 @@ export function computeLeague(players: Player[], games: Game[], now: Date = new 
     const side = winnerOf(g);
     const win = side === 'red' ? red : blue;
     const lose = side === 'red' ? blue : red;
-    const teamLk = (team: PlayerStats[]) => team.reduce((s, p) => s + meta.get(p.playerId)!.fixed, 0) / team.length;
+    const teamLk = (team: PlayerStats[]) => team.reduce((s, p) => s + truncLk(p.lk), 0) / team.length;
 
     const winLk = teamLk(win);
     const loseLk = teamLk(lose);
