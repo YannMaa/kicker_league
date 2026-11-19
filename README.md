@@ -46,7 +46,7 @@ Alle Statistiken werden aus den Rohdaten (labs/players/games) berechnet, nur die
 - `service_role` key gehört nur in `.env` (lokal) und GitHub Secrets, nie ins Frontend.
 
 ## Score-System
-- **Tabelle:** Sieg 1 Punkt → Tordifferenz → geschossene Tore.
+- **Tabelle:** sortiert nach LK (beste zuerst), bei Gleichstand Siege, dann Tordifferenz.
 - **LK (Leistungsklasse)** nach dem Verfahren des Deutschen Tennis Bundes (Durchführungsbestimmungen zur LKO, Stand 01.01.2024):
   - LK 1,5 = beste, 25 = schlechteste Stufe, Anzeige mit einer Nachkommastelle (abgeschnitten). Start bei **LK 24,0**.
   - **Nur der Sieger verbessert sich**, um `P / H`; der Verlierer bleibt unverändert.

@@ -12,18 +12,24 @@ export function formatDate(iso: string) {
   return sameDay ? `today ${time}` : `${d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })} ${time}`;
 }
 
-export function GameRow({ game, highlight }: { game: Game; highlight?: string }) {
+export function GameRow({ game, highlight, to }: { game: Game; highlight?: string; to?: string }) {
   const { playersById, league } = useLeague();
   const w = winnerOf(game);
   const rating = league.gameRatings.get(game.id);
   const team = (side: 'red' | 'blue') => (
     <div className={`flex min-w-0 flex-1 items-center gap-1 ${side === 'blue' ? 'flex-row-reverse text-right' : ''}`}>
       <div className={`flex ${side === 'blue' ? 'flex-row-reverse' : ''} -space-x-2`}>
-        {teamOf(game, side).map((id) => (
-          <Link key={id} to={`/players/${id}`}>
-            <Avatar player={playersById.get(id)} size={30} ring={side} />
-          </Link>
-        ))}
+        {teamOf(game, side).map((id) =>
+          to ? (
+            <span key={id}>
+              <Avatar player={playersById.get(id)} size={30} ring={side} />
+            </span>
+          ) : (
+            <Link key={id} to={`/players/${id}`}>
+              <Avatar player={playersById.get(id)} size={30} ring={side} />
+            </Link>
+          ),
+        )}
       </div>
       <div className={`min-w-0 truncate text-xs ${w === side ? 'font-extrabold' : 'text-white/70'}`}>
         {teamOf(game, side)
@@ -33,7 +39,7 @@ export function GameRow({ game, highlight }: { game: Game; highlight?: string })
     </div>
   );
   const gain = highlight && rating ? (rating.gains[highlight] ?? 0) : undefined;
-  return (
+  const body = (
     <div className="flex items-center gap-2 rounded-xl bg-black/20 px-2 py-2">
       {team('red')}
       <div className="flex flex-col items-center">
@@ -50,5 +56,12 @@ export function GameRow({ game, highlight }: { game: Game; highlight?: string })
       </div>
       {team('blue')}
     </div>
+  );
+  return to ? (
+    <Link to={to} className="block transition active:scale-[0.98]">
+      {body}
+    </Link>
+  ) : (
+    body
   );
 }

@@ -22,8 +22,6 @@ export const LK_WORST = 25;
 export const LK_WEEKLY_SURCHARGE = 0.025;
 /** § 4: im Doppel wird P/H zu je 50 % auf die beiden Sieger verteilt */
 export const DOUBLES_SHARE = 0.5;
-/** Unter so vielen Spielen gilt man als "Rookie" (nur Anzeige/Insights, hat keinen Einfluss auf die LK). */
-export const PROVISIONAL_GAMES = 5;
 /** Bayes-Prior (nur für Insights wie "beste Paarung"): so tun, als gäbe es schon 5 Spiele mit 50 %. */
 export const PRIOR_GAMES = 5;
 export const PRIOR_RATE = 0.5;
@@ -41,7 +39,6 @@ export interface PlayerStats {
   points: number;
   /** LK-Begleitwert (volle Genauigkeit). Anzeige mit formatLk(). Kleiner = besser. */
   lk: number;
-  provisional: boolean;
   /** Alle Ergebnisse chronologisch (ältestes zuerst) */
   results: Result[];
   /** Letzte 5 Ergebnisse, ältestes zuerst */
@@ -137,7 +134,6 @@ function emptyStats(playerId: string): PlayerStats {
     diff: 0,
     points: 0,
     lk: LK_START,
-    provisional: true,
     results: [],
     form: [],
     currentStreak: { type: null, length: 0 },
@@ -262,27 +258,19 @@ export function computeLeague(players: Player[], games: Game[], now: Date = new 
   for (const s of stats.values()) {
     s.diff = s.goalsFor - s.goalsAgainst;
     s.points = s.wins;
-    s.provisional = s.games < PROVISIONAL_GAMES;
     s.form = s.results.slice(-5);
   }
   return { players: stats, gameRatings, lkHistory };
 }
 
-/** Fußball-Tabelle: Punkte → Tordifferenz → geschossene Tore → weniger Spiele */
-export function sortTable(list: PlayerStats[]): PlayerStats[] {
-  return [...list].sort(
-    (a, b) =>
-      b.points - a.points ||
-      b.diff - a.diff ||
-      b.goalsFor - a.goalsFor ||
-      a.games - b.games ||
-      a.playerId.localeCompare(b.playerId),
-  );
-}
-
-/** LK-Ranking: kleinere LK = besser, bei Gleichstand mehr Siege */
+/** Tabelle/Ranking: kleinere LK = besser. Bei Gleichstand: mehr Siege, bessere Tordifferenz, weniger Spiele. */
 export function sortRanking(list: PlayerStats[]): PlayerStats[] {
   return [...list].sort(
-    (a, b) => a.lk - b.lk || b.wins - a.wins || a.games - b.games || a.playerId.localeCompare(b.playerId),
+    (a, b) =>
+      a.lk - b.lk ||
+      b.wins - a.wins ||
+      b.diff - a.diff ||
+      a.games - b.games ||
+      a.playerId.localeCompare(b.playerId),
   );
 }

@@ -8,6 +8,7 @@ import { Table } from './pages/Table';
 import { Profile } from './pages/Profile';
 import { Insights } from './pages/Insights';
 import { QrPrint } from './pages/QrPrint';
+import { MatchDetail } from './pages/MatchDetail';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
             <Route path="game" element={<NewGame />} />
             <Route path="players/new" element={<Register />} />
             <Route path="players/:id" element={<Profile />} />
+            <Route path="matches/:id" element={<MatchDetail />} />
             <Route path="table" element={<Table />} />
             {/* alte deutsche Adressen (z.B. bereits gescannte QR-Codes) */}
             <Route path="spiel" element={<Navigate to="/game" replace />} />

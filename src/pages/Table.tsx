@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useLeague } from '../lib/store';
-import { formatLk, sortTable } from '../lib/rating';
+import { formatLk, sortRanking } from '../lib/rating';
 import { Avatar } from '../components/Avatar';
 import { Diff, FormDots } from '../components/Form';
 
 export function Table() {
   const { league, playersById, labsById } = useLeague();
   const all = [...league.players.values()];
-  const rows = sortTable(all);
+  const rows = sortRanking(all);
   return (
     <div>
       <h1 className="mb-3 font-score text-4xl tracking-wider drop-shadow">Table</h1>
@@ -34,7 +34,7 @@ export function Table() {
                     <Link to={`/players/${p.id}`} className="flex items-center gap-2">
                       <Avatar player={p} size={32} />
                       <span className="min-w-0">
-                        <span className="block truncate font-bold">{p.name}{s.provisional && <span className="ml-1 rounded bg-yellow-300 px-1 text-[9px] font-extrabold text-black">ROOKIE</span>}</span>
+                        <span className="block truncate font-bold">{p.name}</span>
                         <span className="block truncate text-[10px] text-white/60">{(p.lab_id && labsById.get(p.lab_id)?.name) || '–'}</span>
                       </span>
                     </Link>
@@ -52,7 +52,7 @@ export function Table() {
         </table>
       </div>
       <p className="mt-3 text-xs text-white/70">
-        Table: win = 1 point (so ranked by Wins), then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every week all LKs drop by 0.025. Tap a player to see their profile.
+        Sorted by LK (best first), ties by wins, then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every week all LKs drop by 0.025. Tap a player to see their profile.
       </p>
     </div>
   );

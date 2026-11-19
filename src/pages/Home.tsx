@@ -6,17 +6,13 @@ import { GameRow } from '../components/GameRow';
 import { Section } from '../components/Section';
 
 export function Home() {
-  const { league, playersById, games, players, loading } = useLeague();
+  const { league, playersById, games, loading } = useLeague();
   const ranking = sortRanking([...league.players.values()].filter((s) => s.games > 0)).slice(0, 3);
   const recent = [...games].reverse().slice(0, 5);
   const order = [1, 0, 2]; // podium: 2nd – 1st – 3rd
   const medal = ['🥇', '🥈', '🥉'];
   return (
     <div>
-      <Link to="/game" className="btn-ball mb-6 w-full !py-6 text-3xl shadow-[0_6px_0_#94a3b8]">
-        ⚽ Log a match
-      </Link>
-
       <Section title="Podium">
         {loading ? (
           <p>Loading…</p>
@@ -47,15 +43,10 @@ export function Home() {
 
       <Section title="Recent matches" right={<Link to="/table" className="text-sm underline">Table →</Link>}>
         <div className="space-y-2">
-          {recent.map((g) => <GameRow key={g.id} game={g} />)}
+          {recent.map((g) => <GameRow key={g.id} game={g} to={`/matches/${g.id}`} />)}
           {!recent.length && <p className="text-white/70">Nothing played yet.</p>}
         </div>
       </Section>
-
-      <div className="pitch-card text-center">
-        <p className="mb-2 font-bold">{players.length} players · {games.length} matches</p>
-        <Link to="/players/new" className="btn-ghost">➕ New here? Register</Link>
-      </div>
     </div>
   );
 }

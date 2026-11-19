@@ -66,7 +66,6 @@ export function Profile() {
         <div>
           <h1 className="font-score text-5xl leading-none tracking-wider">{p.name}</h1>
           <div className="text-white/80">{(p.lab_id && labsById.get(p.lab_id)?.name) || 'No lab'}</div>
-          {s.provisional && <span className="rounded bg-yellow-300 px-1.5 text-xs font-extrabold text-black">ROOKIE (&lt; 5 matches)</span>}
         </div>
       </div>
       <div className="mb-4 grid grid-cols-4 gap-2">

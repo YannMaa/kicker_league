@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Game, Lab, Player } from './types';
-import { LK_START, bayesRate, computeLeague, formatLk, hurdleH, pointsP, sortRanking, sortTable } from './rating';
+import { LK_START, bayesRate, computeLeague, formatLk, hurdleH, pointsP, sortRanking } from './rating';
 import {
   bestDuo,
   biggestRivalry,
@@ -129,11 +129,11 @@ describe('LK-Berechnung', () => {
     expect(l1.gameRatings.get(upset.id)!.gains['b']).toBeGreaterThan(l2.gameRatings.get(fav.id)!.gains['a']);
   });
 
-  it('Ranking: kleinere LK zuerst; Tabelle: Punkte, dann Tordifferenz', () => {
+  it('Ranking: kleinere LK zuerst, bei Gleichstand Siege, dann Tordifferenz', () => {
     const pl = ['a', 'b', 'c'].map((x) => P(x));
     const games = [G(['a'], ['c'], 10, 9), G(['b'], ['c'], 10, 2)];
     const league = computeLeague(pl, games, SAME_WEEK);
-    const table = sortTable([...league.players.values()]);
+    const table = sortRanking([...league.players.values()]);
     expect(table.map((s) => s.playerId)).toEqual(['b', 'a', 'c']);
     expect(table[0]).toMatchObject({ points: 1, diff: 8, goalsFor: 10, goalsAgainst: 2 });
     expect(sortRanking([...league.players.values()])[2].playerId).toBe('c');

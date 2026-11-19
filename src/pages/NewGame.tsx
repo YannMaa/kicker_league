@@ -9,6 +9,7 @@ import { Avatar } from '../components/Avatar';
 import { PlayerPicker } from '../components/PlayerPicker';
 import { ScoreCounter } from '../components/ScoreCounter';
 import { MatchHistory } from '../components/MatchHistory';
+import { LkGainRow } from '../components/LkGainRow';
 
 type Slot = 'red_1' | 'red_2' | 'blue_1' | 'blue_2';
 interface Draft {
@@ -222,7 +223,7 @@ export function NewGame() {
 }
 
 function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void; onAgain: () => void }) {
-  const { playersById, league, reload } = useLeague();
+  const { league, reload } = useLeague();
   const [err, setErr] = useState<string | null>(null);
   const w = winnerOf(game);
   const r = league.gameRatings.get(game.id);
@@ -240,23 +241,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
     }
   }
 
-  const row = (id: string) => {
-    const p = playersById.get(id);
-    const gain = r?.gains[id] ?? 0;
-    const s = league.players.get(id);
-    return (
-      <Link to={`/players/${id}`} key={id} className="flex items-center gap-3 rounded-xl bg-black/20 p-2">
-        <Avatar player={p} size={40} />
-        <span className="flex-1 font-bold">{p?.name}</span>
-        <span className="text-right text-xs text-white/70">
-          {s ? (gain > 0 ? `LK ${formatLk(s.lk + gain)} → ${formatLk(s.lk)}` : `LK ${formatLk(s.lk)}`) : ''}
-        </span>
-        <span className={`w-24 text-right font-score text-2xl ${gain > 0 ? 'text-lime-300' : 'text-white/50'}`}>
-          +{gain.toFixed(2)} LK
-        </span>
-      </Link>
-    );
-  };
+  const row = (id: string) => <LkGainRow key={id} game={game} id={id} showChange />;
 
   return (
     <div className="text-center">
@@ -281,7 +266,7 @@ function SavedScreen({ game, onUndo, onAgain }: { game: Game; onUndo: () => void
         <button className="btn-ball py-4 text-lg" onClick={onAgain}>
           🔁 Rematch (same teams)
         </button>
-        <Link to="/tabelle" className="btn-ghost">
+        <Link to="/table" className="btn-ghost">
           📊 To the table
         </Link>
         <button className="text-sm text-white/70 underline" onClick={undo}>
