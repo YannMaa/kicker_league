@@ -246,5 +246,47 @@
       "hairColor": "4a312c",
       "skinColor": "edb98a"
     }
+  },
+  {
+    "id": "b4339b3f-0667-43cd-a28b-aa3b0e834c78",
+    "name": "Janna",
+    "lab_id": "2ed5cc60-eaa2-4e0c-bffb-b76b35f7ef26",
+    "avatar_style": "adventurer",
+    "avatar_seed": "cf3qwnva",
+    "created_at": "2026-11-24T21:05:44.416665+00:00",
+    "archived_at": null,
+    "avatar_options": {
+      "mood": "happy",
+      "hairColor": "a55728",
+      "skinColor": "ffdbb4"
+    }
+  },
+  {
+    "id": "78ab7d3a-9f2d-42d9-b4cd-6c3644551ff8",
+    "name": "Guest",
+    "lab_id": null,
+    "avatar_style": "adventurer",
+    "avatar_seed": "wtl3pdn1",
+    "created_at": "2026-11-24T21:09:13.365078+00:00",
+    "archived_at": null,
+    "avatar_options": {
+      "mood": "cool",
+      "hairColor": "f59797",
+      "skinColor": "ffdbb4"
+    }
+  },
+  {
+    "id": "688fd8d6-9114-442e-aa4a-e46fe74224fb",
+    "name": "Annemarie",
+    "lab_id": "2ed5cc60-eaa2-4e0c-bffb-b76b35f7ef26",
+    "avatar_style": "adventurer",
+    "avatar_seed": "fpuek4jj",
+    "created_at": "2026-11-25T11:38:22.5245+00:00",
+    "archived_at": null,
+    "avatar_options": {
+      "mood": "happy",
+      "hairColor": "4a312c",
+      "skinColor": "edb98a"
+    }
   }
 ]
