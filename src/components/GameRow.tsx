@@ -18,7 +18,7 @@ export function GameRow({ game, highlight, to }: { game: Game; highlight?: strin
   const rating = league.gameRatings.get(game.id);
   const team = (side: 'red' | 'blue') => (
     <div className={`flex min-w-0 flex-1 items-center gap-1 ${side === 'blue' ? 'flex-row-reverse text-right' : ''}`}>
-      <div className={`flex ${side === 'blue' ? 'flex-row-reverse' : ''} -space-x-2`}>
+      <div className={`flex shrink-0 -space-x-2 ${side === 'blue' ? 'flex-row-reverse space-x-reverse' : ''}`}>
         {teamOf(game, side).map((id) =>
           to ? (
             <span key={id}>
