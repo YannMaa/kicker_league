@@ -46,6 +46,11 @@ export function Home() {
           {recent.map((g) => <GameRow key={g.id} game={g} to={`/matches/${g.id}`} />)}
           {!recent.length && <p className="text-white/70">Nothing played yet.</p>}
         </div>
+        {games.length > 0 && (
+          <Link to="/matches" className="btn-ghost mt-3 w-full">
+            Show all matches →
+          </Link>
+        )}
       </Section>
     </div>
   );

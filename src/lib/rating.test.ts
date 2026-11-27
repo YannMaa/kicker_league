@@ -121,6 +121,20 @@ describe('LK-Berechnung', () => {
     expect(computeLeague(idle, [], new Date('2027-06-01T12:00:00Z')).players.get('x')!.lk).toBe(25);
   });
 
+  it('ab dem Stichtag +0,1 pro Woche, davor weiter +0,025', () => {
+    const at = (created: string, now: string) =>
+      computeLeague([{ ...P('x'), created_at: created }], [], new Date(now)).players.get('x')!.lk;
+    // nur neue Wochen: 4 × 0,1
+    expect(at('2026-11-30T10:00:00Z', '2026-12-28T12:00:00Z')).toBeCloseTo(24.4);
+    // bis Sonntag 29.11. gilt noch nichts Neues, am Montag 30.11. kommt erstmals 0,1 dazu
+    expect(at('2026-11-16T10:00:00Z', '2026-11-29T23:00:00Z')).toBeCloseTo(24.025);
+    expect(at('2026-11-16T10:00:00Z', '2026-11-30T01:00:00Z')).toBeCloseTo(24.125);
+    // gemischt: 2 alte + 2 neue Wochen
+    expect(at('2026-11-09T10:00:00Z', '2026-12-07T12:00:00Z')).toBeCloseTo(24.25);
+    // Deckel
+    expect(at('2026-11-30T10:00:00Z', '2027-06-01T12:00:00Z')).toBe(25);
+  });
+
   it('ein Sieg gegen einen Stärkeren bringt mehr als gegen einen Schwächeren', () => {
     const pl = ['a', 'b', 'c'].map((x) => P(x));
     const setup: Game[] = [];

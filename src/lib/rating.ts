@@ -18,8 +18,12 @@ export const LK_START = 24;
 export const LK_BEST = 1.5;
 /** § 6.2 / § 5: schlechtester Wert 25,0 */
 export const LK_WORST = 25;
-/** § 5: jede Woche +0,025 auf die LK (also eine kleine Verschlechterung), bis 25 */
-export const LK_WEEKLY_SURCHARGE = 0.025;
+/** § 5: jede Woche ein Aufschlag auf die LK (also eine Verschlechterung), bis 25. Hier bewusst +0,1 statt Tennis (+0,025). */
+export const LK_WEEKLY_SURCHARGE = 0.1;
+/** Alter Satz für alle Wochen vor dem Stichtag, damit sich die Vergangenheit nicht rückwirkend ändert. */
+export const LK_OLD_WEEKLY_SURCHARGE = 0.025;
+/** Montag der ersten Woche mit neuem Satz. Verbucht wird er jeweils am folgenden Montag, erstmals am 30.11.2026. */
+export const LK_SURCHARGE_CHANGE = '2026-11-23';
 /** § 4: im Doppel wird P/H zu je 50 % auf die beiden Sieger verteilt */
 export const DOUBLES_SHARE = 0.5;
 /** Bayes-Prior (nur für Insights wie "beste Paarung"): so tun, als gäbe es schon 5 Spiele mit 50 %. */
@@ -123,6 +127,14 @@ function weekOf(t: string | number): number {
   return Math.floor((new Date(t).getTime() / 86_400_000 - 4) / 7);
 }
 
+/** Summe der Wochen-Aufschläge für die abgeschlossenen Wochen von `from` bis ausschließlich `to`. */
+function surcharge(from: number, to: number): number {
+  const change = weekOf(LK_SURCHARGE_CHANGE);
+  const oldWeeks = Math.max(0, Math.min(to, change) - from);
+  const newWeeks = Math.max(0, to - Math.max(from, change));
+  return oldWeeks * LK_OLD_WEEKLY_SURCHARGE + newWeeks * LK_WEEKLY_SURCHARGE;
+}
+
 function emptyStats(playerId: string): PlayerStats {
   return {
     playerId,
@@ -150,7 +162,7 @@ interface Meta {
  * Berechnet Tabelle und LK für alle Spieler.
  * - Jedes Spiel wird gegen die LK bewertet, die die Spieler direkt vor dem Spiel hatten (angezeigte LK, eine Stelle abgeschnitten).
  * - Nur Sieger verbessern sich um P/H (Doppel: je 50 %), Verlierer bleiben unverändert (§ 3, § 4).
- * - Zum Wochenwechsel kommen 0,025 auf jede LK (§ 5), begrenzt auf 1,5 … 25,0 (§ 6.2).
+ * - Zum Wochenwechsel kommen 0,1 auf jede LK (vor dem Stichtag 0,025, § 5), begrenzt auf 1,5 … 25,0 (§ 6.2).
  * Abweichung vom Tennis (§ 6.1): Dort werden alle Ergebnisse einer Woche gegen die LK vom Wochenanfang gerechnet
  * und erst mittwochs ausgewiesen. Hier zählt der aktuelle Stand pro Spiel, die Anzeige ist sofort aktuell.
  */
@@ -186,8 +198,7 @@ export function computeLeague(players: Player[], games: Game[], now: Date = new 
     if (to <= cur) return;
     for (const [id, m] of meta) {
       const s = stats.get(id)!;
-      const weeks = Math.max(0, to - Math.max(cur, m.joinWeek));
-      if (s.lk < LK_WORST) s.lk = Math.min(LK_WORST, s.lk + weeks * LK_WEEKLY_SURCHARGE);
+      if (s.lk < LK_WORST) s.lk = Math.min(LK_WORST, s.lk + surcharge(Math.max(cur, m.joinWeek), to));
       s.lk = Math.max(LK_BEST, s.lk);
     }
     cur = to;

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLeague } from '../lib/store';
-import { formatLk, sortRanking } from '../lib/rating';
+import { LK_WEEKLY_SURCHARGE, formatLk, sortRanking } from '../lib/rating';
 import { Avatar } from '../components/Avatar';
 import { Diff, FormDots } from '../components/Form';
 
@@ -52,7 +52,7 @@ export function Table() {
         </table>
       </div>
       <p className="mt-3 text-xs text-white/70">
-        Sorted by LK (best first), ties by wins, then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every week all LKs drop by 0.025. Tap a player to see their profile.
+        Sorted by LK (best first), ties by wins, then goal difference. LK works like in tennis: LK 1.5 is the best, 25 the worst, everyone starts at 24. Only winners improve, by points ÷ hurdle (beating stronger opponents is worth more, in doubles each winner gets half); every Monday all LKs get {LK_WEEKLY_SURCHARGE} worse (up to 25). Tap a player to see their profile.
       </p>
     </div>
   );

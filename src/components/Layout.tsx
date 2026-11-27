@@ -33,9 +33,16 @@ export function Layout() {
           Connection problem: {error}
         </div>
       )}
-      <main className="flex-1 px-4 pb-28 pt-4">
+      <main className="flex-1 px-4 pt-4">
         <Outlet />
       </main>
+      {/* pb-28: Platz für die feste Navigation */}
+      <footer className="px-4 pb-28 pt-10 text-center text-[11px] text-white/60 print:hidden">
+        Imprint · Feedback or ideas for improvement? Feel free to email{' '}
+        <a href="mailto:yannis.maag@fau.de" className="underline">
+          yannis.maag@fau.de
+        </a>
+      </footer>
       <nav className="wood no-print fixed inset-x-0 bottom-0 z-20 mx-auto max-w-3xl rounded-t-2xl px-2 pb-[env(safe-area-inset-bottom)]">
         <ul className="grid grid-cols-5">
           {nav.map((n) => (

@@ -55,7 +55,7 @@ Alle Statistiken werden aus den Rohdaten (labs/players/games) berechnet, nur die
   - **Nur der Sieger verbessert sich**, um `P / H`; der Verlierer bleibt unverändert.
     `P` (10 … 110) hängt von der LK-Differenz der Gegner ab (Sieg gegen Stärkere = mehr Punkte), `H = 10 × (30 − LK)` ist die Hürde (je besser, desto mehr Punkte pro Stufe).
   - **Doppel:** Team-LK = Durchschnitt der Partner. `P / H` wird einmal berechnet und **je zur Hälfte** auf beide Sieger verteilt.
-  - **Wöchentlich** werden alle LK um 0,025 schlechter (Motivationsaufschlag, max. 25). Jedes Spiel wird gegen die LK bewertet, die die Spieler direkt davor hatten (im Tennis: Wochenstand, hier bewusst aktueller Stand).
+  - **Wöchentlich** (Montag) werden alle LK um 0,1 schlechter (Motivationsaufschlag, max. 25; im Tennis 0,025). Wochen vor dem 23.11.2026 rechnen weiter mit 0,025. Jedes Spiel wird gegen die LK bewertet, die die Spieler direkt davor hatten (im Tennis: Wochenstand, hier bewusst aktueller Stand).
   - Nicht übernommen: Altersfaktor, Zählweisenfaktor, Mannschafts-/Meisterschaftsboni, Nichtantreten, Erlass des Aufschlags nach 12 Monaten Pause.
   - Das Tor-Ergebnis zählt, wie im Tennis, nur für Sieg/Niederlage, nicht für die LK. Es zählt für Tabelle und Tordifferenz.
 Formeln und Konstanten stehen in `src/lib/rating.ts`. Alles wird aus den Spielen berechnet, nichts davon ist in der Datenbank gespeichert.
