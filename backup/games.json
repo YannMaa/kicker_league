@@ -478,5 +478,29 @@
     "score_red": 4,
     "score_blue": 10,
     "deleted_at": null
+  },
+  {
+    "id": "64a71ae3-c41e-4d21-b9b1-03c670cbc149",
+    "created_at": "2026-11-26T14:51:26.443623+00:00",
+    "mode": "2v2",
+    "red_1": "3e8430e2-71be-4454-b1fc-a39002d7b0ff",
+    "red_2": "0c6cd60f-0d17-4a01-812b-6d7d20e4b65f",
+    "blue_1": "dcd43442-ff6b-4ac0-b3f3-dd0003cf9909",
+    "blue_2": "ba883124-464e-4026-aae2-6e95390c2602",
+    "score_red": 8,
+    "score_blue": 10,
+    "deleted_at": null
+  },
+  {
+    "id": "e1e68e63-6e4b-4b7b-8f0b-13b4310b01e9",
+    "created_at": "2026-11-27T12:32:29.27184+00:00",
+    "mode": "2v2",
+    "red_1": "688fd8d6-9114-442e-aa4a-e46fe74224fb",
+    "red_2": "495ff55b-11a1-4bf0-9210-f2868833a384",
+    "blue_1": "0f7eff55-878e-4d8c-a532-77f4e84fc0c8",
+    "blue_2": "72a46bbc-ccb0-4b1a-8951-6d4cf697a028",
+    "score_red": 3,
+    "score_blue": 10,
+    "deleted_at": null
   }
 ]

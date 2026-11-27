@@ -288,5 +288,19 @@
       "hairColor": "4a312c",
       "skinColor": "edb98a"
     }
+  },
+  {
+    "id": "72a46bbc-ccb0-4b1a-8951-6d4cf697a028",
+    "name": "Pablo",
+    "lab_id": "2ed5cc60-eaa2-4e0c-bffb-b76b35f7ef26",
+    "avatar_style": "avataaars",
+    "avatar_seed": "gpdkxvxo",
+    "created_at": "2026-11-27T12:32:12.586806+00:00",
+    "archived_at": null,
+    "avatar_options": {
+      "mood": "happy",
+      "hairColor": "4a312c",
+      "skinColor": "edb98a"
+    }
   }
 ]
